@@ -12,11 +12,64 @@ type FidgetSpinnerProps = {
 };
 
 const thresholdConfig = [
-    {threshold: 0.9, scale: 8},
-    {threshold: 0.7, scale: 4},
+    // {threshold: 0.9, scale: 8},
+    // {threshold: 0.7, scale: 4},
+    // {threshold: 0.3, scale: 2}, //works well for 2rem
+    // {threshold: 0, scale: 1},
+    {threshold: 0.9, scale: 5},
+    {threshold: 0.7, scale: 3},
     {threshold: 0.3, scale: 2},
     {threshold: 0, scale: 1},
 ];
+
+const genZPositiveWords = {
+    expressions: [
+        'bussin', // really good, especially food
+        'slaps', // amazing, excellent
+        'fire', // awesome
+        'lit', // amazing
+        'goated', // greatest of all time
+        'hits different', // exceptionally good
+        'based', // being yourself, agreeable
+        'no cap', // no lie, for real
+        'periodt', // period, emphasizing truth
+        'slay', // doing great
+        'iconic', // memorable, amazing
+        'main character', // being the best version of yourself
+        'understood the assignment', // did well
+        'vibe', // good feeling
+        'clean', // looks good
+        'fresh', // looks good
+        'valid', // acceptable, good
+        'hits', // really good
+        'W', // win, success
+        'dub', // win, victory
+        'sheesh', // expression of amazement
+        'lowkey fire', // surprisingly good
+        'highkey', // obviously great
+        'straight facts', // absolutely true
+        'living rent free', // memorable in a good way
+        'ate', // did extremely well
+        'snapped', // did amazingly
+        'tea', // truth
+        'giving', // reminds of, emanates
+        'main', // favorite
+        'energy', // vibe, attitude
+        'blessed', // fortunate
+        'goals', // aspirational
+        'flex', // showing off (positively)
+        'drip', // stylish
+        'hits hard', // very impactful
+        'immaculate', // perfect
+        'elite', // top tier
+        'wholesome', // pure, good
+        'vibing', // enjoying the moment
+        'pop off', // do something impressive
+        'queen', // term of endearment
+        'king', // term of endearment
+        'legend', // impressive person
+    ],
+};
 
 export const FidgetSpinner = ({
     dampingCoefficient = 0.5, // Reduced to make it spin longer
@@ -39,14 +92,11 @@ export const FidgetSpinner = ({
 
     const [scale, setScale] = useState(1);
 
-    const startScaling = useCallback(({newScale = 1, multiplier = 1}: {newScale?: number; multiplier?: number}) => {
+    const startScaling = useCallback(({newScale = 1}: {newScale?: number}) => {
         scalingStartTimeRef.current = performance.now();
         initialScaleRef.current = scaleRef.current;
-        if (newScale) {
-            targetScaleRef.current = newScale;
-        } else {
-            targetScaleRef.current = scaleRef.current * multiplier;
-        }
+        targetScaleRef.current = newScale;
+
         isScalingRef.current = true;
     }, []);
 
@@ -208,12 +258,37 @@ export const FidgetSpinner = ({
         [dampingCoefficient, maxAngularVelocity, beginReset, resetState]
     );
 
+    const lastEchoTimeRef = useRef<number | null>(null);
+
+    const echoAnimation = useCallback(() => {
+        const timestamp = performance.now();
+        if (lastEchoTimeRef.current === null) {
+            lastEchoTimeRef.current = timestamp;
+        }
+        const deltaTime = timestamp - lastEchoTimeRef.current;
+
+        // Calculate spawn interval based on velocity thresholds
+        const velocity = angularVelocityRef.current;
+        const velocityRatio = velocity / maxAngularVelocity;
+        const minInterval = 50; // Minimum time between echoes (ms)
+        const maxInterval = 500; // Maximum time between echoes (ms)
+
+        // Spawn interval gets shorter as velocity increases
+        const spawnInterval = maxInterval - (maxInterval - minInterval) * velocityRatio;
+
+        if (deltaTime > spawnInterval && velocity > 0) {
+            createEcho();
+            lastEchoTimeRef.current = timestamp;
+        }
+    }, [maxAngularVelocity]);
+
     const animation = useCallback(
         (deltaTime: number) => {
             rotationAnimation(deltaTime);
             scaleAnimation();
+            echoAnimation();
         },
-        [rotationAnimation, scaleAnimation]
+        [rotationAnimation, scaleAnimation, echoAnimation]
     );
 
     const addEnergy = useCallback(() => {
@@ -229,6 +304,50 @@ export const FidgetSpinner = ({
     useAnimationFrame(animation);
 
     const size = 500;
+
+    function createEcho() {
+        const echo = document.createElement('div');
+        // echo.textContent = document.getElementById('flywheel').textContent;
+        echo.textContent =
+            genZPositiveWords.expressions[Math.floor(Math.random() * genZPositiveWords.expressions.length)];
+
+        echo.className = 'echo text-3xl';
+        echo.style.position = 'absolute';
+        echo.style.left = '50%';
+        echo.style.top = '50%';
+        echo.style.animation = 'none';
+        echo.style.opacity = '1';
+        // Add horizontal movement
+        const startTime = Date.now();
+        const duration = 1000; // 1 second duration
+        const maxDistance = Math.min(100 * (1 + Math.abs(angularVelocityRef.current) / 10), 600); // Maximum distance in pixels, scales with velocity
+        const angle = Math.random() * 2 * Math.PI;
+        function moveEcho() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Calculate x and y components based on angle
+            const distance = progress * maxDistance;
+            const x = Math.cos(angle) * distance;
+            const y = Math.sin(angle) * distance;
+
+            // Fade opacity from 1 to 0 over the duration
+            const opacity = 1 - progress;
+
+            echo.style.transform = `translate(${x - 50}%, ${y - 50}%)`;
+            echo.style.opacity = opacity.toString();
+
+            if (progress < 1) {
+                requestAnimationFrame(moveEcho);
+            }
+        }
+
+        document.getElementById('container')?.appendChild(echo);
+        moveEcho();
+
+        // Remove the element after animation completes
+        setTimeout(() => echo.remove(), duration);
+    }
 
     const triggerMouseClickAnimation = (e: React.MouseEvent<HTMLDivElement>) => {
         const clickAnim = document.createElement('div');
@@ -256,9 +375,6 @@ export const FidgetSpinner = ({
 
     return (
         <div>
-            <button onClick={() => startScaling({multiplier: 1.5})}>Scale Up</button>
-            <button onClick={() => startScaling({multiplier: 0.5})}>Scale Down</button>
-
             <div
                 id="container"
                 style={{position: 'relative', width: `${size}px`, height: `${size}px`, cursor: 'pointer'}}>
@@ -278,7 +394,7 @@ export const FidgetSpinner = ({
                         zIndex: 100,
                         overflow: 'hidden',
                     }}>
-                    🍷
+                    🪿
                 </div>
             </div>
         </div>
