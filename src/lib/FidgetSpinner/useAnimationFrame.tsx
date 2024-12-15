@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react';
 
 // From this https://css-tricks.com/using-requestanimationframe-with-react-hooks/
 
-const useAnimationFrame = (callback: (deltaTime: number) => void) => {
+export const useAnimationFrame = (callback: (deltaTime: number) => void) => {
     const requestRef = useRef(0);
     const previousTimeRef = useRef(0);
 
