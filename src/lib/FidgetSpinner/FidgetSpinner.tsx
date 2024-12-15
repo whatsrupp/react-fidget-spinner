@@ -71,6 +71,8 @@ const genZPositiveWords = {
     ],
 };
 
+const scores = ['+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '+10'];
+
 export const FidgetSpinner = ({
     dampingCoefficient = 0.5, // Reduced to make it spin longer
     initialAngle = 0,
@@ -278,6 +280,7 @@ export const FidgetSpinner = ({
 
         if (deltaTime > spawnInterval && velocity > 0) {
             createEcho();
+            createScore();
             lastEchoTimeRef.current = timestamp;
         }
     }, [maxAngularVelocity]);
@@ -304,6 +307,54 @@ export const FidgetSpinner = ({
     useAnimationFrame(animation);
 
     const size = 500;
+
+    function createScore() {
+        const score = document.createElement('div');
+        score.textContent = scores[Math.floor(Math.random() * scores.length)];
+        score.className = 'score text-3xl';
+        score.style.position = 'absolute';
+        score.style.left = '50%';
+        score.style.top = '50%';
+        score.style.opacity = '1';
+
+        const startTime = Date.now();
+        const duration = 2000; // 2 second duration
+        const maxHeight = 50 + Math.random() * 100; // Random height between 150-250px
+        const wobbleAmplitude = 1 + Math.random() * 40; // Random amplitude between 20-50px
+        const wobbleFrequency = 0.1 + Math.random() * 0.5; // Random frequency between 1.5-3
+        const randomXOffset = (Math.random() - 0.5) * 15;
+
+        function animateScore() {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Ease out cubic for vertical movement
+            const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+            const y = -maxHeight * easeOutCubic;
+
+            // Mix of sine and cosine waves with different frequencies for more random-feeling wobble
+            const wobbleX =
+                Math.sin(progress * Math.PI * 2 * wobbleFrequency) * wobbleAmplitude * 0.6 +
+                Math.cos(progress * Math.PI * 3.7 * wobbleFrequency) * wobbleAmplitude * 0.4 +
+                Math.sin(progress * Math.PI * 5.3 * wobbleFrequency) * wobbleAmplitude * 0.2;
+            const x = wobbleX + randomXOffset;
+
+            // Fade out in the last 30% of animation
+            const opacity = progress > 0.7 ? 1 - (progress - 0.7) / 0.3 : 1;
+
+            score.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%))`;
+            score.style.opacity = opacity.toString();
+
+            if (progress < 1) {
+                requestAnimationFrame(animateScore);
+            } else {
+                score.remove();
+            }
+        }
+
+        document.getElementById('container')?.appendChild(score);
+        animateScore();
+    }
 
     function createEcho() {
         const echo = document.createElement('div');
