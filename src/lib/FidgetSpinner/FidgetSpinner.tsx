@@ -23,7 +23,7 @@ export const FidgetSpinner = ({
     const angleRadiansRef = useRef(initialAngle);
     const angularVelocityRef = useRef(initialAngularVelocity);
 
-    const cb = useCallback(
+    const rotationAnimation = useCallback(
         (deltaTime: number) => {
             const dtSeconds = deltaTime / 1000;
 
@@ -48,23 +48,32 @@ export const FidgetSpinner = ({
             setAngleRadians(newAngle);
             setAngularVelocity(newVelocity);
         },
-        [dampingCoefficient]
+        [dampingCoefficient, maxAngularVelocity]
     );
 
-    const addEnergy = () => {
-        angularVelocityRef.current = angularVelocityRef.current + Math.PI * 2;
-    };
+    const animation = useCallback(
+        (deltaTime: number) => {
+            rotationAnimation(deltaTime);
+        },
+        [rotationAnimation]
+    );
 
-    useAnimationFrame(cb);
+    const addEnergy = useCallback(() => {
+        angularVelocityRef.current = angularVelocityRef.current + Math.PI * 2;
+    }, []);
+
+    useAnimationFrame(animation);
 
     const energy = 0.5 * momentOfInertia * angularVelocity * angularVelocity;
 
+    const size = 500;
+
     return (
-        <div style={{width: '100vw', height: '100vh'}}>
+        <div>
             Speed: {angularVelocity.toFixed(2)} rad/s
             <br />
             Energy: {energy.toFixed(2)} J
-            <div style={{position: 'relative', width: '100%', height: '100%', cursor: 'pointer'}}>
+            <div style={{position: 'relative', width: `${size}px`, height: `${size}px`, cursor: 'pointer'}}>
                 <div
                     onClick={addEnergy}
                     style={{
