@@ -11,6 +11,13 @@ type FidgetSpinnerProps = {
     maxAngularVelocity?: number;
 };
 
+const thresholdConfig = [
+    {threshold: 0.9, scale: 8},
+    {threshold: 0.7, scale: 4},
+    {threshold: 0.3, scale: 2},
+    {threshold: 0, scale: 1},
+];
+
 export const FidgetSpinner = ({
     dampingCoefficient = 0.5, // Reduced to make it spin longer
     initialAngle = 0,
@@ -163,20 +170,12 @@ export const FidgetSpinner = ({
                 isScaling: boolean;
                 onScaleChange: (scale: number) => void;
             }) => {
-                const scaleThresholds = [
-                    {threshold: 0.9, scale: 8},
-                    {threshold: 0.7, scale: 4},
-                    {threshold: 0.3, scale: 2},
-                    {threshold: 0, scale: 1},
-                ];
-
-                for (const {threshold, scale} of scaleThresholds) {
+                for (const {threshold, scale} of thresholdConfig) {
                     const targetScale = threshold === 1 ? velocity === maxVelocity : velocity > maxVelocity * threshold;
 
                     if (targetScale) {
                         const newScale = scale * scaleMultiplier;
                         if (currentScale !== newScale && !isScaling) {
-                            console.log('scale change', newScale);
                             onScaleChange(newScale);
                         }
                         return;
@@ -231,6 +230,30 @@ export const FidgetSpinner = ({
 
     const size = 500;
 
+    const triggerMouseClickAnimation = (e: React.MouseEvent<HTMLDivElement>) => {
+        const clickAnim = document.createElement('div');
+        clickAnim.style.position = 'absolute';
+        clickAnim.style.left = `${e.pageX}px`;
+        clickAnim.style.top = `${e.pageY}px`;
+        clickAnim.style.width = '40px';
+        clickAnim.style.height = '40px';
+        clickAnim.style.background = 'rgba(255,0,0,0.8)';
+        clickAnim.style.borderRadius = '50%';
+        clickAnim.style.transform = 'translate(-50%, -50%) scale(0)';
+        clickAnim.style.transition = 'all 0.3s ease-out';
+        clickAnim.style.pointerEvents = 'none';
+        document.body.appendChild(clickAnim);
+
+        // Trigger animation
+        requestAnimationFrame(() => {
+            clickAnim.style.transform = 'translate(-50%, -50%) scale(1)';
+            clickAnim.style.opacity = '0';
+        });
+
+        // Cleanup
+        setTimeout(() => clickAnim.remove(), 300);
+    };
+
     return (
         <div>
             <button onClick={() => startScaling({multiplier: 1.5})}>Scale Up</button>
@@ -242,28 +265,7 @@ export const FidgetSpinner = ({
                 <div
                     onClick={e => {
                         addEnergy();
-                        // Create click animation element
-                        const clickAnim = document.createElement('div');
-                        clickAnim.style.position = 'absolute';
-                        clickAnim.style.left = `${e.pageX}px`;
-                        clickAnim.style.top = `${e.pageY}px`;
-                        clickAnim.style.width = '40px';
-                        clickAnim.style.height = '40px';
-                        clickAnim.style.background = 'rgba(255,0,0,0.8)';
-                        clickAnim.style.borderRadius = '50%';
-                        clickAnim.style.transform = 'translate(-50%, -50%) scale(0)';
-                        clickAnim.style.transition = 'all 0.3s ease-out';
-                        clickAnim.style.pointerEvents = 'none';
-                        document.body.appendChild(clickAnim);
-
-                        // Trigger animation
-                        requestAnimationFrame(() => {
-                            clickAnim.style.transform = 'translate(-50%, -50%) scale(1)';
-                            clickAnim.style.opacity = '0';
-                        });
-
-                        // Cleanup
-                        setTimeout(() => clickAnim.remove(), 300);
+                        triggerMouseClickAnimation(e);
                     }}
                     style={{
                         position: 'absolute',
