@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        #flywheel {
+            transform: rotate(0deg) translateX(0px) scale(1);
+            transition: transform linear;
+            position: relative;
+        }
+    </style>
+    <script>
+        // Animation parameters
+        const ENERGY_PER_CLICK = 100;   // Energy added per click
+        const INERTIA = 0.3;            // How quickly energy dissipates (lower = more inertia)
+        const RESET_SPEED = 5;          // Speed of reset animation in degrees per millisecond
+        const MAX_ENERGY = 10000;         // Maximum energy to prevent excessive speed
+        const WOBBLE_AMPLITUDE = 100;      // Maximum pixel offset for wobble
+        const MAX_SCALE = 5;             // Maximum size multiplier
+        const ECHO_INTERVAL = 200;        // Time between echo emissions in ms
+        let energy = 0;
+        let lastTime = null;
+        let animationFrame;
+        let totalRotation = 0;
+        let isResetting = false;
+        let hasReset = false;
+        let lastEchoTime = 0;
+
+        const genZPositiveWords = {
+  expressions: [
+    'bussin',        // really good, especially food
+    'slaps',         // amazing, excellent
+    'fire',          // awesome
+    'lit',           // amazing
+    'goated',        // greatest of all time
+    'hits different', // exceptionally good
+    'based',         // being yourself, agreeable
+    'no cap',        // no lie, for real
+    'periodt',       // period, emphasizing truth
+    'slay',          // doing great
+    'iconic',        // memorable, amazing
+    'main character', // being the best version of yourself
+    'understood the assignment', // did well
+    'vibe',          // good feeling
+    'clean',         // looks good
+    'fresh',         // looks good
+    'valid',         // acceptable, good
+    'hits',          // really good
+    'W',             // win, success
+    'dub',           // win, victory
+    'sheesh',        // expression of amazement
+    'lowkey fire',   // surprisingly good
+    'highkey',       // obviously great
+    'straight facts', // absolutely true
+    'living rent free', // memorable in a good way
+    'ate',           // did extremely well
+    'snapped',       // did amazingly
+    'tea',           // truth
+    'giving',        // reminds of, emanates
+    'main',          // favorite
+    'energy',        // vibe, attitude
+    'blessed',       // fortunate
+    'goals',         // aspirational
+    'flex',          // showing off (positively)
+    'drip',          // stylish
+    'hits hard',     // very impactful
+    'immaculate',    // perfect
+    'elite',         // top tier
+    'wholesome',     // pure, good
+    'vibing',        // enjoying the moment
+    'pop off',       // do something impressive
+    'queen',         // term of endearment
+    'king',          // term of endearment
+    'legend',        // impressive person
+  ]
+};
+
+        const randomWords = [
+            'cool',
+            'wow',
+            'nice',
+            'phwoar',
+            'oi oi',
+            'sick',
+            'fab',
+            'amazeballs',
+            'rad',
+            'awesome',
+            'radical',
+            '🌟',
+            '✨',
+            '💫',
+            '⚡',
+            '🔥',
+            '🎉',
+            '🎊',
+            '🌈',
+            '💥',
+            '🚀',
+            '💫',
+            '🌸'
+        ]
+
+        const randomEmojis = [
+            '🌟',
+            '✨',
+            '💫',
+            '⚡',
+            '🔥',
+            '🎉',
+            '🎊',
+            '🌈',
+            '💥',
+            '🚀',
+            '💫',
+            '🌸'
+        ]
+
+        function createEcho() {
+            const echo = document.createElement('div');
+            // echo.textContent = document.getElementById('flywheel').textContent;
+            echo.textContent = genZPositiveWords.expressions[Math.floor(Math.random() * genZPositiveWords.expressions.length)];
+
+            echo.className = 'echo text-3xl';
+            echo.style.position = 'absolute';
+            echo.style.left = '50%';
+            echo.style.top = '50%';
+            echo.style.animation = 'none';
+            echo.style.opacity = '1';
+            // Add horizontal movement
+            let startTime = Date.now();
+            const duration = 1000; // 1 second duration
+            const maxDistance = Math.min(100 * (1 + energy/1000), 400); // Maximum distance in pixels, scales with energy
+            const angle = Math.random() * 2 * Math.PI;
+            function moveEcho() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Calculate x and y components based on angle
+                const distance = progress * maxDistance;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                
+                // Fade opacity from 1 to 0 over the duration
+                const opacity = 1 - progress;
+                
+                echo.style.transform = `translate(${x - 50}%, ${y - 50}%)`;
+                echo.style.opacity = opacity;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(moveEcho);
+                }
+            }
+            
+            document.getElementById('flywheel-container').appendChild(echo);
+            moveEcho();
+            
+            // Remove the element after animation completes
+            setTimeout(() => echo.remove(), duration);
+        }
+
+        function resetState() {
+            if (animationFrame) {
+                cancelAnimationFrame(animationFrame);
+            }
+            energy = 0;
+            lastTime = null;
+            totalRotation = 0;
+            isResetting = false;
+            animationFrame = null;
+            flywheel.style.transform = 'rotate(0deg) translateX(0px) scale(1)';
+        }
+        function updateFlywheel(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+
+            if (isResetting) {
+                // Calculate shortest path to 0 degrees while moving anticlockwise
+                let targetRotation = totalRotation < 0 ? -360 : 0;
+                
+                // Calculate distance to target and adjust speed based on remaining distance
+                const distanceToTarget = Math.abs(totalRotation - targetRotation);
+                const speedMultiplier = distanceToTarget / 360; // Slower as we get closer
+                const adjustedSpeed = RESET_SPEED * speedMultiplier * deltaTime;
+                
+                totalRotation = totalRotation - adjustedSpeed;
+                
+                // Scale down as it resets
+                const scale = 1 + (energy / MAX_ENERGY) * (MAX_SCALE - 1);
+                flywheel.style.transform = `rotate(${totalRotation}deg) translateX(0px) scale(${scale})`;
+                
+                if (distanceToTarget < 0.1) {
+                    resetState();
+                    return;
+                }
+                animationFrame = requestAnimationFrame(updateFlywheel);
+                return;
+            }
+
+            // Reduce energy over time based on inertia
+            const energyDecrease = deltaTime * INERTIA;
+            energy = Math.max(0, energy - energyDecrease);
+
+            // Create echoes based on energy level
+            if (energy > MAX_ENERGY * 0.3 && timestamp - lastEchoTime > ECHO_INTERVAL) {
+
+                lastEchoTime = timestamp;
+            }
+
+            // Create echoes at random intervals based on energy level
+            const energyRatio = energy / MAX_ENERGY;
+            const minInterval = 10;  // Minimum time between echoes (ms)
+            const maxInterval = 200; // Maximum time between echoes (ms)
+            // Invert the ratio so higher energy = shorter interval
+            const dynamicInterval = minInterval + ((maxInterval - minInterval) * Math.pow(1 - energyRatio, 3));
+            console.log(dynamicInterval);
+            
+            if (energy > 0 && timestamp - lastEchoTime > dynamicInterval) {
+                createEcho();
+                lastEchoTime = timestamp;
+            }
+            
+            // Update total rotation
+            totalRotation = (totalRotation + (energy / 1000) * deltaTime) % 360;  // Divide by 1000 to maintain same speed
+            
+            // Add wobble effect based on rotation
+            const wobble = Math.sin(totalRotation * (Math.PI / 180) * 2) * WOBBLE_AMPLITUDE * (energy / MAX_ENERGY);
+            
+            // Calculate scale based on energy level
+            const scale = 1 + (energy / MAX_ENERGY) * (MAX_SCALE - 1);
+            
+            flywheel.style.transform = `rotate(${totalRotation}deg) translateX(${wobble}px) scale(${scale})`;
+
+            if (energy > 0) {
+                animationFrame = requestAnimationFrame(updateFlywheel);
+            } else {
+                isResetting = true;
+                animationFrame = requestAnimationFrame(updateFlywheel);
+            }
+        }
+
+        function addEnergy() {
+            // Allow interrupting reset animation
+            if (isResetting) {
+                isResetting = false;
+            }
+            // createEcho();
+
+            energy = Math.min(energy + ENERGY_PER_CLICK, MAX_ENERGY); // Cap the energy at MAX_ENERGY
+            if (!animationFrame) {
+                animationFrame = requestAnimationFrame(updateFlywheel);
+            }
+        }
+    </script>
+</head>
+<body class="w-screen h-screen flex justify-center items-center" style="background-color: #F3D173;">
+    <div class="relative" id="flywheel-container">
+        <div id="flywheel" class="text-9xl cursor-pointer no-select select-none z-20" onclick="addEnergy()">
+            🪿
+        </div>
+    </div>
+</body>
+</html>
