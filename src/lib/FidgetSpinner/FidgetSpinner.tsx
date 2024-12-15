@@ -1,4 +1,5 @@
 import {useCallback, useRef, useState} from 'react';
+import BezierEasing from 'bezier-easing';
 
 import {useAnimationFrame} from './useAnimationFrame';
 
@@ -11,20 +12,76 @@ type FidgetSpinnerProps = {
 };
 
 export const FidgetSpinner = ({
-    momentOfInertia = 0.0001, // Increased to make it heavier and spin slower
     dampingCoefficient = 0.5, // Reduced to make it spin longer
     initialAngle = 0,
-    initialAngularVelocity = Math.PI * 20, // Reduced initial velocity significantly
+    initialAngularVelocity = 0, // Reduced initial velocity significantly
     maxAngularVelocity = Math.PI * 20,
 }: FidgetSpinnerProps) => {
     const [angleRadians, setAngleRadians] = useState(initialAngle); // in radians
-    const [angularVelocity, setAngularVelocity] = useState(initialAngularVelocity); // in radians per second
-    // const [angularAcceleration, setAngularAcceleration] = useState(0); // in radians per second squared
     const angleRadiansRef = useRef(initialAngle);
     const angularVelocityRef = useRef(initialAngularVelocity);
+    const isResettingRef = useRef(false);
+    const resetStartTimeRef = useRef<number | null>(null);
+    const resetStartAngleRef = useRef<number | null>(null);
+
+    const resetState = useCallback(() => {
+        setAngleRadians(initialAngle);
+        angleRadiansRef.current = initialAngle;
+        angularVelocityRef.current = initialAngularVelocity;
+        isResettingRef.current = false;
+        resetStartTimeRef.current = null;
+        resetStartAngleRef.current = null;
+    }, [initialAngle, initialAngularVelocity]);
+
+    const beginReset = useCallback(() => {
+        isResettingRef.current = true;
+        resetStartTimeRef.current = performance.now();
+        resetStartAngleRef.current = angleRadiansRef.current;
+    }, []);
+
+    const cancelReset = useCallback(() => {
+        isResettingRef.current = false;
+        resetStartTimeRef.current = null;
+        resetStartAngleRef.current = null;
+    }, []);
 
     const rotationAnimation = useCallback(
         (deltaTime: number) => {
+            if (isResettingRef.current) {
+                // Define exact duration in milliseconds
+                const RESET_DURATION = 200; // 2 seconds
+                if (resetStartTimeRef.current === null) {
+                    resetStartTimeRef.current = performance.now();
+                }
+                // Calculate progress based on elapsed time
+                const elapsedTime = performance.now() - resetStartTimeRef.current;
+                const timeProgress = Math.min(elapsedTime / RESET_DURATION, 1);
+                const easing = BezierEasing(0.67, 0.03, 0.86, 0.49);
+                const easedProgress = easing(timeProgress);
+
+                // Get the starting angle when reset began (using a ref)
+                if (resetStartAngleRef.current === null) {
+                    resetStartAngleRef.current = angleRadiansRef.current;
+                }
+
+                console.log(resetStartAngleRef.current);
+                const targetAngle = resetStartAngleRef.current < 0 ? -2 * Math.PI : 0;
+
+                // Interpolate between start and target angles
+                const newAngle =
+                    resetStartAngleRef.current + (targetAngle - resetStartAngleRef.current) * easedProgress;
+
+                // Reset everything when animation is complete
+                if (timeProgress >= 1) {
+                    resetState();
+                    return;
+                }
+
+                angleRadiansRef.current = newAngle;
+                setAngleRadians(newAngle);
+                return;
+            }
+
             const dtSeconds = deltaTime / 1000;
 
             const damping = angularVelocityRef.current < 10 ? dampingCoefficient * 4 : dampingCoefficient;
@@ -35,7 +92,7 @@ export const FidgetSpinner = ({
             );
 
             if (newVelocity < 2) {
-                angularVelocityRef.current = 0;
+                beginReset();
                 return;
             }
 
@@ -46,9 +103,8 @@ export const FidgetSpinner = ({
             angularVelocityRef.current = newVelocity;
 
             setAngleRadians(newAngle);
-            setAngularVelocity(newVelocity);
         },
-        [dampingCoefficient, maxAngularVelocity]
+        [dampingCoefficient, maxAngularVelocity, beginReset, resetState]
     );
 
     const animation = useCallback(
@@ -59,20 +115,19 @@ export const FidgetSpinner = ({
     );
 
     const addEnergy = useCallback(() => {
+        if (isResettingRef.current === true) {
+            cancelReset();
+        }
+
         angularVelocityRef.current = angularVelocityRef.current + Math.PI * 2;
-    }, []);
+    }, [cancelReset]);
 
     useAnimationFrame(animation);
-
-    const energy = 0.5 * momentOfInertia * angularVelocity * angularVelocity;
 
     const size = 500;
 
     return (
         <div>
-            Speed: {angularVelocity.toFixed(2)} rad/s
-            <br />
-            Energy: {energy.toFixed(2)} J
             <div style={{position: 'relative', width: `${size}px`, height: `${size}px`, cursor: 'pointer'}}>
                 <div
                     onClick={addEnergy}
