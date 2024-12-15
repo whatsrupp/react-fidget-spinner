@@ -27,25 +27,32 @@ export const FidgetSpinner = ({
     const scalingStartTimeRef = useRef<number | null>(null);
     const initialScaleRef = useRef<number | null>(null);
     const targetScaleRef = useRef<number | null>(null);
+    const isScalingRef = useRef(false);
     const scaleRef = useRef(1);
 
     const [scale, setScale] = useState(1);
 
-    const scaleTransitionTime = 200;
-
-    const startScaling = useCallback((multiplier: number) => {
+    const startScaling = useCallback(({newScale = 1, multiplier = 1}: {newScale?: number; multiplier?: number}) => {
         scalingStartTimeRef.current = performance.now();
         initialScaleRef.current = scaleRef.current;
-        targetScaleRef.current = scaleRef.current * multiplier;
+        if (newScale) {
+            targetScaleRef.current = newScale;
+        } else {
+            targetScaleRef.current = scaleRef.current * multiplier;
+        }
+        isScalingRef.current = true;
     }, []);
 
     const endScaling = useCallback(() => {
         scalingStartTimeRef.current = null;
         initialScaleRef.current = null;
         targetScaleRef.current = null;
+        isScalingRef.current = false;
     }, []);
 
     const scaleAnimation = useCallback(() => {
+        const scaleTransitionTime = 500;
+
         const scaleStartTime = scalingStartTimeRef.current;
         const scaleStartScale = initialScaleRef.current;
         const targetScale = targetScaleRef.current;
@@ -53,10 +60,11 @@ export const FidgetSpinner = ({
         if (!scaleStartTime || !scaleStartScale || !targetScale) {
             return;
         }
-
+        // const easing = BezierEasing(0.62, -0.33, 1, -0.62);
         const elapsedTime = performance.now() - scaleStartTime;
         const timeProgress = Math.min(elapsedTime / scaleTransitionTime, 1);
-        const easing = BezierEasing(0, -0.36, 0, -0.73);
+        // const easing = BezierEasing(0, -0.36, 0, -0.73);
+        const easing = BezierEasing(0.25, -0.75, 0.8, 1.2);
         const easedProgress = easing(timeProgress);
 
         const newScale = scaleStartScale + (targetScale - scaleStartScale) * easedProgress;
@@ -128,11 +136,62 @@ export const FidgetSpinner = ({
             const dtSeconds = deltaTime / 1000;
 
             const damping = angularVelocityRef.current < 15 ? dampingCoefficient * 6 : dampingCoefficient;
-
             const newVelocity = Math.min(
                 angularVelocityRef.current * Math.exp(-damping * dtSeconds),
                 maxAngularVelocity
             );
+
+            if (newVelocity === maxAngularVelocity) {
+                console.log('max velocity');
+            }
+
+            const scaleMultiplier = 1.5;
+
+            // Scale based on velocity thresholds
+            const updateScaleBasedOnVelocity = ({
+                velocity,
+                maxVelocity,
+                scaleMultiplier,
+                currentScale,
+                isScaling,
+                onScaleChange,
+            }: {
+                velocity: number;
+                maxVelocity: number;
+                scaleMultiplier: number;
+                currentScale: number;
+                isScaling: boolean;
+                onScaleChange: (scale: number) => void;
+            }) => {
+                const scaleThresholds = [
+                    {threshold: 0.9, scale: 8},
+                    {threshold: 0.7, scale: 4},
+                    {threshold: 0.3, scale: 2},
+                    {threshold: 0, scale: 1},
+                ];
+
+                for (const {threshold, scale} of scaleThresholds) {
+                    const targetScale = threshold === 1 ? velocity === maxVelocity : velocity > maxVelocity * threshold;
+
+                    if (targetScale) {
+                        const newScale = scale * scaleMultiplier;
+                        if (currentScale !== newScale && !isScaling) {
+                            console.log('scale change', newScale);
+                            onScaleChange(newScale);
+                        }
+                        return;
+                    }
+                }
+            };
+
+            updateScaleBasedOnVelocity({
+                velocity: newVelocity,
+                maxVelocity: maxAngularVelocity,
+                scaleMultiplier,
+                currentScale: scaleRef.current,
+                isScaling: isScalingRef.current,
+                onScaleChange: newScale => startScaling({newScale}),
+            });
 
             if (newVelocity < 2) {
                 beginReset();
@@ -162,8 +221,8 @@ export const FidgetSpinner = ({
         if (isResettingRef.current === true) {
             cancelReset();
         }
-        // const multiplier = 0.4;
-        const multiplier = 1;
+        const multiplier = 0.9;
+        // const multiplier = 1;
 
         angularVelocityRef.current = angularVelocityRef.current + Math.PI * 2 * multiplier;
     }, [cancelReset]);
@@ -174,8 +233,8 @@ export const FidgetSpinner = ({
 
     return (
         <div>
-            <button onClick={() => startScaling(1.5)}>Scale Up</button>
-            <button onClick={() => startScaling(0.5)}>Scale Down</button>
+            <button onClick={() => startScaling({multiplier: 1.5})}>Scale Up</button>
+            <button onClick={() => startScaling({multiplier: 0.5})}>Scale Down</button>
 
             <div
                 id="container"
@@ -211,13 +270,13 @@ export const FidgetSpinner = ({
                         left: '50%',
                         top: '50%',
                         transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
-                        fontSize: '10rem',
+                        fontSize: '2rem',
                         cursor: 'pointer',
                         userSelect: 'none',
                         zIndex: 100,
                         overflow: 'hidden',
                     }}>
-                    💸
+                    🍷
                 </div>
             </div>
         </div>
