@@ -16,60 +16,87 @@ const thresholdConfig = [
     // {threshold: 0.7, scale: 4},
     // {threshold: 0.3, scale: 2}, //works well for 2rem
     // {threshold: 0, scale: 1},
-    {threshold: 0.9, scale: 5},
-    {threshold: 0.7, scale: 3},
-    {threshold: 0.3, scale: 2},
+    {threshold: 0.9, scale: 3},
+    {threshold: 0.7, scale: 2},
+    {threshold: 0.3, scale: 1.5},
     {threshold: 0, scale: 1},
 ];
 
-const genZPositiveWords = {
-    expressions: [
-        'bussin', // really good, especially food
-        'slaps', // amazing, excellent
-        'fire', // awesome
-        'lit', // amazing
-        'goated', // greatest of all time
-        'hits different', // exceptionally good
-        'based', // being yourself, agreeable
-        'no cap', // no lie, for real
-        'periodt', // period, emphasizing truth
-        'slay', // doing great
-        'iconic', // memorable, amazing
-        'main character', // being the best version of yourself
-        'understood the assignment', // did well
-        'vibe', // good feeling
-        'clean', // looks good
-        'fresh', // looks good
-        'valid', // acceptable, good
-        'hits', // really good
-        'W', // win, success
-        'dub', // win, victory
-        'sheesh', // expression of amazement
-        'lowkey fire', // surprisingly good
-        'highkey', // obviously great
-        'straight facts', // absolutely true
-        'living rent free', // memorable in a good way
-        'ate', // did extremely well
-        'snapped', // did amazingly
-        'tea', // truth
-        'giving', // reminds of, emanates
-        'main', // favorite
-        'energy', // vibe, attitude
-        'blessed', // fortunate
-        'goals', // aspirational
-        'flex', // showing off (positively)
-        'drip', // stylish
-        'hits hard', // very impactful
-        'immaculate', // perfect
-        'elite', // top tier
-        'wholesome', // pure, good
-        'vibing', // enjoying the moment
-        'pop off', // do something impressive
-        'queen', // term of endearment
-        'king', // term of endearment
-        'legend', // impressive person
-    ],
-};
+const expressions = [
+    'bussin', // really good, especially food
+    'slaps', // amazing, excellent
+    'fire', // awesome
+    'lit', // amazing
+    'goated', // greatest of all time
+    'hits different', // exceptionally good
+    'based', // being yourself, agreeable
+    'no cap', // no lie, for real
+    'periodt', // period, emphasizing truth
+    'slay', // doing great
+    'iconic', // memorable, amazing
+    'main character', // being the best version of yourself
+    'understood the assignment', // did well
+    'vibe', // good feeling
+    'clean', // looks good
+    'fresh', // looks good
+    'valid', // acceptable, good
+    'hits', // really good
+    'W', // win, success
+    'dub', // win, victory
+    'sheesh', // expression of amazement
+    'lowkey fire', // surprisingly good
+    'highkey', // obviously great
+    'straight facts', // absolutely true
+    'living rent free', // memorable in a good way
+    'ate', // did extremely well
+    'snapped', // did amazingly
+    'tea', // truth
+    'giving', // reminds of, emanates
+    'main', // favorite
+    'energy', // vibe, attitude
+    'blessed', // fortunate
+    'goals', // aspirational
+    'flex', // showing off (positively)
+    'drip', // stylish
+    'hits hard', // very impactful
+    'immaculate', // perfect
+    'elite', // top tier
+    'wholesome', // pure, good
+    'vibing', // enjoying the moment
+    'pop off', // do something impressive
+    'queen', // term of endearment
+    'king', // term of endearment
+    'legend', // impressive person
+    '🔥', // fire
+    '💯', // 100
+    '⭐', // star
+    '✨', // sparkles
+    '🌟', // glowing star
+    '💪', // flexed biceps
+    '👑', // crown
+    '🏆', // trophy
+    '🎯', // direct hit
+    '💎', // gem
+    '🚀', // rocket
+    '✅', // check mark
+    '💅', // nail polish
+    '👏', // clapping hands
+    '🙌', // raising hands
+    '🎉', // party popper
+    '🎊', // confetti ball
+    '🌈', // rainbow
+    '💝', // heart with ribbon
+    '💖', // sparkling heart
+    '🎨', // artist palette
+    '🌺', // flower
+    '🦋', // butterfly
+    '🌞', // sun with face
+    '🍀', // four leaf clover
+    '🎵', // musical note
+    '💫', // sparkle
+    '🌸', // cherry blossom
+    '🌻', // sunflower
+];
 
 const scores = ['+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '+10'];
 
@@ -280,8 +307,31 @@ export const FidgetSpinner = ({
 
         if (deltaTime > spawnInterval && velocity > 0) {
             createEcho();
-            createScore();
             lastEchoTimeRef.current = timestamp;
+        }
+    }, [maxAngularVelocity]);
+
+    const lastScoreTimeRef = useRef<number | null>(null);
+
+    const scoreAnimation = useCallback(() => {
+        const timestamp = performance.now();
+        if (lastScoreTimeRef.current === null) {
+            lastScoreTimeRef.current = timestamp;
+        }
+        const deltaTime = timestamp - lastScoreTimeRef.current;
+
+        // Calculate spawn interval based on velocity thresholds
+        const velocity = angularVelocityRef.current;
+        const velocityRatio = velocity / maxAngularVelocity;
+        const minInterval = 1000; // Minimum time between echoes (ms)
+        const maxInterval = 5000; // Maximum time between echoes (ms)
+
+        // Spawn interval gets shorter as velocity increases
+        const spawnInterval = maxInterval - (maxInterval - minInterval) * velocityRatio;
+
+        if (deltaTime > spawnInterval && velocity > 0) {
+            createScore();
+            lastScoreTimeRef.current = timestamp;
         }
     }, [maxAngularVelocity]);
 
@@ -290,8 +340,9 @@ export const FidgetSpinner = ({
             rotationAnimation(deltaTime);
             scaleAnimation();
             echoAnimation();
+            scoreAnimation();
         },
-        [rotationAnimation, scaleAnimation, echoAnimation]
+        [rotationAnimation, scaleAnimation, echoAnimation, scoreAnimation]
     );
 
     const addEnergy = useCallback(() => {
@@ -306,23 +357,25 @@ export const FidgetSpinner = ({
 
     useAnimationFrame(animation);
 
-    const size = 500;
+    const size = 2000;
 
     function createScore() {
         const score = document.createElement('div');
         score.textContent = scores[Math.floor(Math.random() * scores.length)];
-        score.className = 'score text-3xl';
         score.style.position = 'absolute';
         score.style.left = '50%';
         score.style.top = '50%';
         score.style.opacity = '1';
+        score.style.fontSize = '1rem';
 
         const startTime = Date.now();
-        const duration = 2000; // 2 second duration
-        const maxHeight = 50 + Math.random() * 100; // Random height between 150-250px
+        const duration = 1500 + Math.random() * 1000; // Random duration between 1.5-2.5 seconds
+        const maxHeight = 100 + Math.random() * 200; // Random height between 150-250px
         const wobbleAmplitude = 1 + Math.random() * 40; // Random amplitude between 20-50px
         const wobbleFrequency = 0.1 + Math.random() * 0.5; // Random frequency between 1.5-3
-        const randomXOffset = (Math.random() - 0.5) * 15;
+        const randomXOffset = (Math.random() - 0.5) * 100;
+        const startScale = 0.5 + Math.random() * 0.5; // Random start scale between 0.5-1
+        const endScale = startScale + 0.5 + Math.random() * 0.2; // End scale 1-2 larger than start
 
         function animateScore() {
             const elapsed = Date.now() - startTime;
@@ -342,7 +395,10 @@ export const FidgetSpinner = ({
             // Fade out in the last 30% of animation
             const opacity = progress > 0.7 ? 1 - (progress - 0.7) / 0.3 : 1;
 
-            score.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%))`;
+            // Scale animation
+            const scale = startScale + (endScale - startScale) * easeOutCubic;
+
+            score.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${scale})`;
             score.style.opacity = opacity.toString();
 
             if (progress < 1) {
@@ -359,8 +415,7 @@ export const FidgetSpinner = ({
     function createEcho() {
         const echo = document.createElement('div');
         // echo.textContent = document.getElementById('flywheel').textContent;
-        echo.textContent =
-            genZPositiveWords.expressions[Math.floor(Math.random() * genZPositiveWords.expressions.length)];
+        echo.textContent = expressions[Math.floor(Math.random() * expressions.length)];
 
         echo.className = 'echo text-3xl';
         echo.style.position = 'absolute';
@@ -371,7 +426,7 @@ export const FidgetSpinner = ({
         // Add horizontal movement
         const startTime = Date.now();
         const duration = 1000; // 1 second duration
-        const maxDistance = Math.min(100 * (1 + Math.abs(angularVelocityRef.current) / 10), 600); // Maximum distance in pixels, scales with velocity
+        const maxDistance = Math.min(200 * (1 + Math.abs(angularVelocityRef.current) / 10), 600); // Maximum distance in pixels, scales with velocity
         const angle = Math.random() * 2 * Math.PI;
         function moveEcho() {
             const elapsed = Date.now() - startTime;
@@ -428,7 +483,13 @@ export const FidgetSpinner = ({
         <div>
             <div
                 id="container"
-                style={{position: 'relative', width: `${size}px`, height: `${size}px`, cursor: 'pointer'}}>
+                style={{
+                    position: 'relative',
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    cursor: 'pointer',
+                    backgroundColor: '#F3D173',
+                }}>
                 <div
                     onClick={e => {
                         addEnergy();
@@ -439,7 +500,7 @@ export const FidgetSpinner = ({
                         left: '50%',
                         top: '50%',
                         transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
-                        fontSize: '2rem',
+                        fontSize: '4rem',
                         cursor: 'pointer',
                         userSelect: 'none',
                         zIndex: 100,
