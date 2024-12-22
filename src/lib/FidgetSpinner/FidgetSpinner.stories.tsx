@@ -2,7 +2,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 
 import {FidgetSpinner} from './FidgetSpinner';
 import {BubbleSpawner} from './Bubble';
-
+import {SparkSpawner} from './Spark';
 const meta = {
     title: 'Example/FidgetSpinner',
     component: FidgetSpinner,
@@ -34,6 +34,16 @@ export const BubbleSpawnerStory: Story = {
         return (
             <div style={{width: 500, height: 500, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                 <BubbleSpawner {...args} />
+            </div>
+        );
+    },
+};
+
+export const SparkSpawnerStory: Story = {
+    render: args => {
+        return (
+            <div style={{width: 500, height: 500, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <SparkSpawner {...args} />
             </div>
         );
     },
