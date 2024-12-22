@@ -1,5 +1,6 @@
 import {useCallback, useRef, useState} from 'react';
 import BezierEasing from 'bezier-easing';
+import ReactDOM from 'react-dom/client';
 
 import {expressions, scores} from './constants';
 import {useAnimationFrame} from './useAnimationFrame';
@@ -146,6 +147,25 @@ const clickConfig = {
     onClickRemove: () => {},
 };
 
+const BubbleComponent = ({content, style}: {content: string; style: React.CSSProperties}) => {
+    return (
+        <div
+            style={{
+                ...style,
+                width: '20px',
+                height: '20px',
+                backgroundColor: '#4CAF50',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+            }}>
+            {content}
+        </div>
+    );
+};
+
 export const FidgetSpinner = () => {
     const dampingCoefficient = spinnerConfig.dampingCoefficient;
     const initialAngle = spinnerConfig.initialAngle;
@@ -165,6 +185,7 @@ export const FidgetSpinner = () => {
     const scaleRef = useRef(spinnerConfig.initialScale);
 
     const [scale, setScale] = useState(spinnerConfig.initialScale);
+    const [isActive, setIsActive] = useState(false);
 
     const startScaling = useCallback(({newScale = 1}: {newScale?: number}) => {
         scalingStartTimeRef.current = performance.now();
@@ -254,6 +275,7 @@ export const FidgetSpinner = () => {
                 if (timeProgress >= 1) {
                     resetState();
                     resetConfig.onResetEnd();
+                    setIsActive(false);
                     return;
                 }
 
@@ -315,7 +337,6 @@ export const FidgetSpinner = () => {
 
             if (newVelocity < 2) {
                 beginReset();
-                return;
             }
 
             const deltaAngle = newVelocity * dtSeconds;
@@ -373,20 +394,22 @@ export const FidgetSpinner = () => {
 
     const animation = useCallback(
         (deltaTime: number) => {
+            if (!isActive) return;
+
             rotationAnimation(deltaTime);
             scaleAnimation();
             sparkAnimation();
             bubbleAnimation();
         },
-        [rotationAnimation, scaleAnimation, sparkAnimation, bubbleAnimation]
+        [isActive, rotationAnimation, scaleAnimation, sparkAnimation, bubbleAnimation]
     );
 
     const addEnergy = useCallback(() => {
         if (isResettingRef.current === true) {
             cancelReset();
         }
+        setIsActive(true);
         const multiplier = 0.9;
-
         angularVelocityRef.current = angularVelocityRef.current + Math.PI * 2 * multiplier;
     }, [cancelReset]);
 
@@ -396,13 +419,14 @@ export const FidgetSpinner = () => {
 
     function createBubble() {
         const bubble = document.createElement('div');
-        bubble.textContent = bubbleConfig.components[Math.floor(Math.random() * bubbleConfig.components.length)];
+        const root = ReactDOM.createRoot(bubble);
         bubble.style.position = 'absolute';
         bubble.style.left = '50%';
         bubble.style.top = '50%';
         bubble.style.opacity = '1';
         bubble.style.fontSize = '1rem';
 
+        const content = bubbleConfig.components[Math.floor(Math.random() * bubbleConfig.components.length)];
         const startTime = performance.now();
         const duration = bubbleConfig.durationMs + Math.random() * bubbleConfig.durationMsRandomness;
         const maxHeight = bubbleConfig.distance + Math.random() * bubbleConfig.distanceRandomness;
@@ -426,15 +450,22 @@ export const FidgetSpinner = () => {
             const x = wobbleX + randomXOffset;
 
             const opacity = progress > 0.7 ? 1 - (progress - 0.7) / 0.3 : 1;
-
             const scale = startScale + (endScale - startScale) * easeOutCubic;
 
-            bubble.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${scale})`;
-            bubble.style.opacity = opacity.toString();
+            root.render(
+                <BubbleComponent
+                    content={content}
+                    style={{
+                        transform: `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${scale})`,
+                        opacity: opacity.toString(),
+                    }}
+                />
+            );
 
             if (progress < 1) {
                 requestAnimationFrame(animateBubble);
             } else {
+                root.unmount();
                 bubble.remove();
                 bubbleConfig.onRemove();
             }
