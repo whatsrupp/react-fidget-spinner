@@ -4,14 +4,6 @@ import BezierEasing from 'bezier-easing';
 import {expressions, scores} from './constants';
 import {useAnimationFrame} from './useAnimationFrame';
 
-type FidgetSpinnerProps = {
-    momentOfInertia?: number;
-    dampingCoefficient?: number;
-    initialAngle?: number;
-    initialAngularVelocity?: number;
-    maxAngularVelocity?: number;
-};
-
 const thresholdConfig = [
     {threshold: 0.9, scale: 3},
     {threshold: 0.7, scale: 2},
@@ -91,6 +83,16 @@ const spinnerConfig = {
     initialScale: 1,
     containerId: 'fidget-spinner-container',
     debug: true,
+    onMaxVelocity: () => {
+        if (spinnerConfig.debug) {
+            console.log('max velocity');
+        }
+    },
+    onClick: () => {
+        if (spinnerConfig.debug) {
+            console.log('click');
+        }
+    },
 };
 
 const toBezierEasing = (easing: readonly [number, number, number, number]) => {
@@ -144,15 +146,14 @@ const clickConfig = {
     onClickRemove: () => {},
 };
 
-export const FidgetSpinner = ({
-    dampingCoefficient = 0.5, // Reduced to make it spin longer
-    initialAngle = 0,
-    initialAngularVelocity = 0, // Reduced initial velocity significantly
-    maxAngularVelocity = Math.PI * 20,
-}: FidgetSpinnerProps) => {
-    const [angleRadians, setAngleRadians] = useState(spinnerConfig.initialAngle); // in radians
-    const angleRadiansRef = useRef(spinnerConfig.initialAngle);
-    const angularVelocityRef = useRef(spinnerConfig.initialAngularVelocity);
+export const FidgetSpinner = () => {
+    const dampingCoefficient = spinnerConfig.dampingCoefficient;
+    const initialAngle = spinnerConfig.initialAngle;
+    const initialAngularVelocity = spinnerConfig.initialAngularVelocity;
+    const maxAngularVelocity = spinnerConfig.maxAngularVelocity;
+    const [angleRadians, setAngleRadians] = useState(initialAngle); // in radians
+    const angleRadiansRef = useRef(initialAngle);
+    const angularVelocityRef = useRef(initialAngularVelocity);
     const isResettingRef = useRef(false);
     const resetStartTimeRef = useRef<number | null>(null);
     const resetStartAngleRef = useRef<number | null>(null);
@@ -270,7 +271,7 @@ export const FidgetSpinner = ({
             );
 
             if (newVelocity === maxAngularVelocity) {
-                console.log('max velocity');
+                spinnerConfig.onMaxVelocity();
             }
 
             const scaleMultiplier = 1.5;
@@ -325,7 +326,7 @@ export const FidgetSpinner = ({
 
             setAngleRadians(newAngle);
         },
-        [dampingCoefficient, maxAngularVelocity, beginReset, resetState, startScaling]
+        [maxAngularVelocity, beginReset, resetState, startScaling, dampingCoefficient]
     );
 
     const lastSparkTimeRef = useRef<number | null>(null);
