@@ -97,7 +97,10 @@ const resetConfig = {
     onResetEnd: () => {
         console.log('reset end');
     },
-    easing: [0.67, 0.03, 0.86, 0.49],
+    onResetCancel: () => {
+        console.log('reset cancel');
+    },
+    easing: [0.67, 0.03, 0.86, 0.49] as const,
 };
 
 const clickConfig = {
@@ -176,6 +179,7 @@ export const FidgetSpinner = ({
     }, [initialAngle, initialAngularVelocity]);
 
     const beginReset = useCallback(() => {
+        resetConfig.onResetStart();
         isResettingRef.current = true;
         resetStartTimeRef.current = performance.now();
         resetStartAngleRef.current = angleRadiansRef.current;
@@ -185,18 +189,19 @@ export const FidgetSpinner = ({
         isResettingRef.current = false;
         resetStartTimeRef.current = null;
         resetStartAngleRef.current = null;
+        resetConfig.onResetCancel();
     }, []);
 
     const rotationAnimation = useCallback(
         (deltaTime: number) => {
             if (isResettingRef.current) {
-                const RESET_DURATION = 200;
+                const RESET_DURATION = resetConfig.durationMs;
                 if (resetStartTimeRef.current === null) {
                     resetStartTimeRef.current = performance.now();
                 }
                 const elapsedTime = performance.now() - resetStartTimeRef.current;
                 const timeProgress = Math.min(elapsedTime / RESET_DURATION, 1);
-                const easing = BezierEasing(0.67, 0.03, 0.86, 0.49);
+                const easing = toBezierEasing(resetConfig.easing);
                 const easedProgress = easing(timeProgress);
 
                 if (resetStartAngleRef.current === null) {
@@ -210,6 +215,7 @@ export const FidgetSpinner = ({
 
                 if (timeProgress >= 1) {
                     resetState();
+                    resetConfig.onResetEnd();
                     return;
                 }
 
