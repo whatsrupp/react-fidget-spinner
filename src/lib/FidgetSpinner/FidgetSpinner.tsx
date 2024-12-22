@@ -1,6 +1,7 @@
 import {useCallback, useRef, useState} from 'react';
 import BezierEasing from 'bezier-easing';
 
+import {scores, expressions} from './constants';
 import {useAnimationFrame} from './useAnimationFrame';
 
 type FidgetSpinnerProps = {
@@ -21,84 +22,6 @@ const thresholdConfig = [
     {threshold: 0.3, scale: 1.5},
     {threshold: 0, scale: 1},
 ];
-
-const expressions = [
-    'bussin', // really good, especially food
-    'slaps', // amazing, excellent
-    'fire', // awesome
-    'lit', // amazing
-    'goated', // greatest of all time
-    'hits different', // exceptionally good
-    'based', // being yourself, agreeable
-    'no cap', // no lie, for real
-    'periodt', // period, emphasizing truth
-    'slay', // doing great
-    'iconic', // memorable, amazing
-    'main character', // being the best version of yourself
-    'understood the assignment', // did well
-    'vibe', // good feeling
-    'clean', // looks good
-    'fresh', // looks good
-    'valid', // acceptable, good
-    'hits', // really good
-    'W', // win, success
-    'dub', // win, victory
-    'sheesh', // expression of amazement
-    'lowkey fire', // surprisingly good
-    'highkey', // obviously great
-    'straight facts', // absolutely true
-    'living rent free', // memorable in a good way
-    'ate', // did extremely well
-    'snapped', // did amazingly
-    'tea', // truth
-    'giving', // reminds of, emanates
-    'main', // favorite
-    'energy', // vibe, attitude
-    'blessed', // fortunate
-    'goals', // aspirational
-    'flex', // showing off (positively)
-    'drip', // stylish
-    'hits hard', // very impactful
-    'immaculate', // perfect
-    'elite', // top tier
-    'wholesome', // pure, good
-    'vibing', // enjoying the moment
-    'pop off', // do something impressive
-    'queen', // term of endearment
-    'king', // term of endearment
-    'legend', // impressive person
-    '🔥', // fire
-    '💯', // 100
-    '⭐', // star
-    '✨', // sparkles
-    '🌟', // glowing star
-    '💪', // flexed biceps
-    '👑', // crown
-    '🏆', // trophy
-    '🎯', // direct hit
-    '💎', // gem
-    '🚀', // rocket
-    '✅', // check mark
-    '💅', // nail polish
-    '👏', // clapping hands
-    '🙌', // raising hands
-    '🎉', // party popper
-    '🎊', // confetti ball
-    '🌈', // rainbow
-    '💝', // heart with ribbon
-    '💖', // sparkling heart
-    '🎨', // artist palette
-    '🌺', // flower
-    '🦋', // butterfly
-    '🌞', // sun with face
-    '🍀', // four leaf clover
-    '🎵', // musical note
-    '💫', // sparkle
-    '🌸', // cherry blossom
-    '🌻', // sunflower
-];
-
-const scores = ['+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '+10'];
 
 export const FidgetSpinner = ({
     dampingCoefficient = 0.5, // Reduced to make it spin longer
@@ -284,7 +207,7 @@ export const FidgetSpinner = ({
 
             setAngleRadians(newAngle);
         },
-        [dampingCoefficient, maxAngularVelocity, beginReset, resetState]
+        [dampingCoefficient, maxAngularVelocity, beginReset, resetState, startScaling]
     );
 
     const lastEchoTimeRef = useRef<number | null>(null);
