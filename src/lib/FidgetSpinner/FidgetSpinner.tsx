@@ -68,10 +68,15 @@ const spinnerConfig = {
     initialAngle: 0,
     initialAngularVelocity: 0,
     maxAngularVelocity: Math.PI * 20,
+    initialScale: 1,
+};
+
+const toBezierEasing = (easing: readonly [number, number, number, number]) => {
+    return BezierEasing(easing[0], easing[1], easing[2], easing[3]);
 };
 
 const scalingConfig = {
-    onChange: (scale: number) => {
+    onScaleChange: (scale: number) => {
         console.log('scale', scale);
     },
     onScaleStart: () => {
@@ -81,7 +86,7 @@ const scalingConfig = {
         console.log('scale end');
     },
     durationMs: 500,
-    easing: [0.25, -0.75, 0.8, 1.2],
+    easing: [0.25, -0.75, 0.8, 1.2] as const,
 };
 
 const resetConfig = {
@@ -105,9 +110,9 @@ export const FidgetSpinner = ({
     initialAngularVelocity = 0, // Reduced initial velocity significantly
     maxAngularVelocity = Math.PI * 20,
 }: FidgetSpinnerProps) => {
-    const [angleRadians, setAngleRadians] = useState(initialAngle); // in radians
-    const angleRadiansRef = useRef(initialAngle);
-    const angularVelocityRef = useRef(initialAngularVelocity);
+    const [angleRadians, setAngleRadians] = useState(spinnerConfig.initialAngle); // in radians
+    const angleRadiansRef = useRef(spinnerConfig.initialAngle);
+    const angularVelocityRef = useRef(spinnerConfig.initialAngularVelocity);
     const isResettingRef = useRef(false);
     const resetStartTimeRef = useRef<number | null>(null);
     const resetStartAngleRef = useRef<number | null>(null);
@@ -116,16 +121,17 @@ export const FidgetSpinner = ({
     const initialScaleRef = useRef<number | null>(null);
     const targetScaleRef = useRef<number | null>(null);
     const isScalingRef = useRef(false);
-    const scaleRef = useRef(1);
+    const scaleRef = useRef(spinnerConfig.initialScale);
 
-    const [scale, setScale] = useState(1);
+    const [scale, setScale] = useState(spinnerConfig.initialScale);
 
     const startScaling = useCallback(({newScale = 1}: {newScale?: number}) => {
         scalingStartTimeRef.current = performance.now();
         initialScaleRef.current = scaleRef.current;
         targetScaleRef.current = newScale;
-
         isScalingRef.current = true;
+        scalingConfig.onScaleStart();
+        scalingConfig.onScaleChange(newScale);
     }, []);
 
     const endScaling = useCallback(() => {
@@ -133,10 +139,11 @@ export const FidgetSpinner = ({
         initialScaleRef.current = null;
         targetScaleRef.current = null;
         isScalingRef.current = false;
+        scalingConfig.onScaleEnd();
     }, []);
 
     const scaleAnimation = useCallback(() => {
-        const scaleTransitionTime = 500;
+        const scaleTransitionTime = scalingConfig.durationMs;
 
         const scaleStartTime = scalingStartTimeRef.current;
         const scaleStartScale = initialScaleRef.current;
@@ -147,7 +154,7 @@ export const FidgetSpinner = ({
         }
         const elapsedTime = performance.now() - scaleStartTime;
         const timeProgress = Math.min(elapsedTime / scaleTransitionTime, 1);
-        const easing = BezierEasing(0.25, -0.75, 0.8, 1.2);
+        const easing = toBezierEasing(scalingConfig.easing);
         const easedProgress = easing(timeProgress);
 
         const newScale = scaleStartScale + (targetScale - scaleStartScale) * easedProgress;
