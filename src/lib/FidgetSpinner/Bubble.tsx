@@ -14,7 +14,7 @@ const bubbleConfig = {
     durationMsRandomness: 1000,
     distance: 100,
     distanceRandomness: 200,
-    velocityEasing: [0.25, -0.75, 0.8, 1.2],
+    velocityEasing: [0.25, 0, 0.8, 1.2],
     opacityEasing: [0.25, -0.75, 0.8, 1.2],
     opacityStart: 1,
     opacityEnd: 0,
@@ -37,7 +37,8 @@ const bubbleConfig = {
     xWobble: ({timeMs}: {timeMs: number}) => {
         return Math.sin(timeMs * bubbleConfig.wobbleFrequency) * bubbleConfig.wobbleAmplitude;
     },
-    yEasing: [0.25, -0.75, 0.8, 1.2],
+    yEasing: [0.25, 0, 0.8, 1.2],
+    frameRate: 60,
 } as const;
 
 export const BubbleSpawner = () => {
@@ -180,7 +181,7 @@ export const Bubble = ({
     xStart,
     xWobbleFunction,
     cleanup,
-    frameRate = 60,
+    frameRate = bubbleConfig.frameRate,
     children,
 }: PropsWithChildren<BubbleProps>) => {
     const startTimestamp = useRef(performance.now());
