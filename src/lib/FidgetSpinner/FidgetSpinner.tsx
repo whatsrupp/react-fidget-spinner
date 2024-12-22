@@ -20,30 +20,40 @@ const thresholdConfig = [
 ];
 
 const bubbleConfig = {
-    minSpawnInterval: 50,
-    maxSpawnInterval: 500,
+    minSpawnInterval: 1000,
+    maxSpawnInterval: 5000,
     components: scores,
-    durationMs: 1000,
-    maxDistance: 600,
-    minDistance: 200,
+    durationMs: 1500,
+    durationMsRandomness: 1000,
+    distance: 100,
+    distanceRandomness: 200,
     velocityEasing: [0.25, -0.75, 0.8, 1.2],
     opacityEasing: [0.25, -0.75, 0.8, 1.2],
     opacityStart: 1,
     opacityEnd: 0,
     startScale: 0.5,
+    startScaleRandomness: 0.5,
     endScale: 1,
-    wobbleFrequency: 0,
-    wobbleAmplitude: 0,
+    endScaleRandomness: 0.2,
+    wobbleFrequency: 0.1,
+    wobbleFrequencyRandomness: 0.5,
+    wobbleAmplitude: 1,
+    wobbleAmplitudeRandomness: 40,
+    xOffsetRandomness: 100,
     onSpawn: () => {
-        console.log('spawn');
+        if (spinnerConfig.debug) {
+            console.log('bubble spawn');
+        }
     },
     onRemove: () => {
-        console.log('remove');
+        if (spinnerConfig.debug) {
+            console.log('bubble remove');
+        }
     },
 };
 
 const sparkConfig = {
-    components: scores,
+    components: expressions,
     minSpawnIntervalMs: 50,
     maxSpawnIntervalMs: 500,
     durationMs: 1000,
@@ -54,10 +64,14 @@ const sparkConfig = {
     opacityStart: 1,
     opacityEnd: 0,
     onSparkSpawn: () => {
-        console.log('spark spawn');
+        if (spinnerConfig.debug) {
+            console.log('spark spawn');
+        }
     },
     onSparkRemove: () => {
-        console.log('spark remove');
+        if (spinnerConfig.debug) {
+            console.log('spark remove');
+        }
     },
 };
 
@@ -75,6 +89,8 @@ const spinnerConfig = {
     initialAngularVelocity: 0,
     maxAngularVelocity: Math.PI * 20,
     initialScale: 1,
+    containerId: 'fidget-spinner-container',
+    debug: true,
 };
 
 const toBezierEasing = (easing: readonly [number, number, number, number]) => {
@@ -83,13 +99,19 @@ const toBezierEasing = (easing: readonly [number, number, number, number]) => {
 
 const scalingConfig = {
     onScaleChange: (scale: number) => {
-        console.log('scale', scale);
+        if (spinnerConfig.debug) {
+            console.log('scale change', scale);
+        }
     },
     onScaleStart: () => {
-        console.log('scale start');
+        if (spinnerConfig.debug) {
+            console.log('scale start');
+        }
     },
     onScaleEnd: () => {
-        console.log('scale end');
+        if (spinnerConfig.debug) {
+            console.log('scale end');
+        }
     },
     durationMs: 500,
     easing: [0.25, -0.75, 0.8, 1.2] as const,
@@ -98,13 +120,19 @@ const scalingConfig = {
 const resetConfig = {
     durationMs: 200,
     onResetStart: () => {
-        console.log('reset start');
+        if (spinnerConfig.debug) {
+            console.log('reset start');
+        }
     },
     onResetEnd: () => {
-        console.log('reset end');
+        if (spinnerConfig.debug) {
+            console.log('reset end');
+        }
     },
     onResetCancel: () => {
-        console.log('reset cancel');
+        if (spinnerConfig.debug) {
+            console.log('reset cancel');
+        }
     },
     easing: [0.67, 0.03, 0.86, 0.49] as const,
 };
@@ -321,24 +349,24 @@ export const FidgetSpinner = ({
         }
     }, [maxAngularVelocity]);
 
-    const lastScoreTimeRef = useRef<number | null>(null);
+    const lastBubbleTimeRef = useRef<number | null>(null);
 
-    const scoreAnimation = useCallback(() => {
+    const bubbleAnimation = useCallback(() => {
         const timestamp = performance.now();
-        if (lastScoreTimeRef.current === null) {
-            lastScoreTimeRef.current = timestamp;
+        if (lastBubbleTimeRef.current === null) {
+            lastBubbleTimeRef.current = timestamp;
         }
-        const deltaTime = timestamp - lastScoreTimeRef.current;
+        const deltaTime = timestamp - lastBubbleTimeRef.current;
 
         const velocity = angularVelocityRef.current;
         const velocityRatio = velocity / maxAngularVelocity;
-        const minInterval = 1000;
-        const maxInterval = 5000;
+        const minInterval = bubbleConfig.minSpawnInterval;
+        const maxInterval = bubbleConfig.maxSpawnInterval;
         const spawnInterval = maxInterval - (maxInterval - minInterval) * velocityRatio;
 
         if (deltaTime > spawnInterval && velocity > 0) {
-            createScore();
-            lastScoreTimeRef.current = timestamp;
+            createBubble();
+            lastBubbleTimeRef.current = timestamp;
         }
     }, [maxAngularVelocity]);
 
@@ -347,9 +375,9 @@ export const FidgetSpinner = ({
             rotationAnimation(deltaTime);
             scaleAnimation();
             sparkAnimation();
-            scoreAnimation();
+            bubbleAnimation();
         },
-        [rotationAnimation, scaleAnimation, sparkAnimation, scoreAnimation]
+        [rotationAnimation, scaleAnimation, sparkAnimation, bubbleAnimation]
     );
 
     const addEnergy = useCallback(() => {
@@ -365,26 +393,26 @@ export const FidgetSpinner = ({
 
     const size = 500;
 
-    function createScore() {
-        const score = document.createElement('div');
-        score.textContent = scores[Math.floor(Math.random() * scores.length)];
-        score.style.position = 'absolute';
-        score.style.left = '50%';
-        score.style.top = '50%';
-        score.style.opacity = '1';
-        score.style.fontSize = '1rem';
+    function createBubble() {
+        const bubble = document.createElement('div');
+        bubble.textContent = bubbleConfig.components[Math.floor(Math.random() * bubbleConfig.components.length)];
+        bubble.style.position = 'absolute';
+        bubble.style.left = '50%';
+        bubble.style.top = '50%';
+        bubble.style.opacity = '1';
+        bubble.style.fontSize = '1rem';
 
-        const startTime = Date.now();
-        const duration = 1500 + Math.random() * 1000;
-        const maxHeight = 100 + Math.random() * 200;
-        const wobbleAmplitude = 1 + Math.random() * 40;
-        const wobbleFrequency = 0.1 + Math.random() * 0.5;
-        const randomXOffset = (Math.random() - 0.5) * 100;
-        const startScale = 0.5 + Math.random() * 0.5;
-        const endScale = startScale + 0.5 + Math.random() * 0.2;
+        const startTime = performance.now();
+        const duration = bubbleConfig.durationMs + Math.random() * bubbleConfig.durationMsRandomness;
+        const maxHeight = bubbleConfig.distance + Math.random() * bubbleConfig.distanceRandomness;
+        const wobbleAmplitude = bubbleConfig.wobbleAmplitude + Math.random() * bubbleConfig.wobbleAmplitudeRandomness;
+        const wobbleFrequency = bubbleConfig.wobbleFrequency + Math.random() * bubbleConfig.wobbleFrequencyRandomness;
+        const randomXOffset = (Math.random() - 0.5) * bubbleConfig.xOffsetRandomness;
+        const startScale = bubbleConfig.startScale + Math.random() * bubbleConfig.startScaleRandomness;
+        const endScale = bubbleConfig.endScale + Math.random() * bubbleConfig.endScaleRandomness;
 
-        function animateScore() {
-            const elapsed = Date.now() - startTime;
+        function animateBubble() {
+            const elapsed = performance.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
             const easeOutCubic = 1 - Math.pow(1 - progress, 3);
@@ -400,23 +428,25 @@ export const FidgetSpinner = ({
 
             const scale = startScale + (endScale - startScale) * easeOutCubic;
 
-            score.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${scale})`;
-            score.style.opacity = opacity.toString();
+            bubble.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${scale})`;
+            bubble.style.opacity = opacity.toString();
 
             if (progress < 1) {
-                requestAnimationFrame(animateScore);
+                requestAnimationFrame(animateBubble);
             } else {
-                score.remove();
+                bubble.remove();
+                bubbleConfig.onRemove();
             }
         }
 
-        document.getElementById('container')?.appendChild(score);
-        animateScore();
+        document.getElementById(spinnerConfig.containerId)?.appendChild(bubble);
+        bubbleConfig.onSpawn();
+        animateBubble();
     }
 
     function createSpark() {
         const spark = document.createElement('div');
-        spark.textContent = expressions[Math.floor(Math.random() * expressions.length)];
+        spark.textContent = sparkConfig.components[Math.floor(Math.random() * sparkConfig.components.length)];
 
         spark.style.position = 'absolute';
         spark.style.left = '50%';
@@ -445,7 +475,7 @@ export const FidgetSpinner = ({
             }
         }
 
-        document.getElementById('container')?.appendChild(spark);
+        document.getElementById(spinnerConfig.containerId)?.appendChild(spark);
         sparkConfig.onSparkSpawn();
 
         animateSpark();
@@ -484,7 +514,7 @@ export const FidgetSpinner = ({
     return (
         <div style={{cursor: 'pointer'}}>
             <div
-                id="container"
+                id={spinnerConfig.containerId}
                 style={{
                     position: 'relative',
                     width: `${size}px`,
