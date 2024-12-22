@@ -53,6 +53,12 @@ const sparkConfig = {
     opacityEasing: [0.25, -0.75, 0.8, 1.2],
     opacityStart: 1,
     opacityEnd: 0,
+    onSparkSpawn: () => {
+        console.log('spark spawn');
+    },
+    onSparkRemove: () => {
+        console.log('spark remove');
+    },
 };
 
 const spinnerConfig = {
@@ -291,24 +297,24 @@ export const FidgetSpinner = ({
         [dampingCoefficient, maxAngularVelocity, beginReset, resetState, startScaling]
     );
 
-    const lastEchoTimeRef = useRef<number | null>(null);
+    const lastSparkTimeRef = useRef<number | null>(null);
 
-    const echoAnimation = useCallback(() => {
+    const sparkAnimation = useCallback(() => {
         const timestamp = performance.now();
-        if (lastEchoTimeRef.current === null) {
-            lastEchoTimeRef.current = timestamp;
+        if (lastSparkTimeRef.current === null) {
+            lastSparkTimeRef.current = timestamp;
         }
-        const deltaTime = timestamp - lastEchoTimeRef.current;
+        const deltaTime = timestamp - lastSparkTimeRef.current;
 
         const velocity = angularVelocityRef.current;
         const velocityRatio = velocity / maxAngularVelocity;
-        const minInterval = 50;
-        const maxInterval = 500;
+        const minInterval = sparkConfig.minSpawnIntervalMs;
+        const maxInterval = sparkConfig.maxSpawnIntervalMs;
         const spawnInterval = maxInterval - (maxInterval - minInterval) * velocityRatio;
 
         if (deltaTime > spawnInterval && velocity > 0) {
-            createEcho();
-            lastEchoTimeRef.current = timestamp;
+            createSpark();
+            lastSparkTimeRef.current = timestamp;
         }
     }, [maxAngularVelocity]);
 
@@ -337,10 +343,10 @@ export const FidgetSpinner = ({
         (deltaTime: number) => {
             rotationAnimation(deltaTime);
             scaleAnimation();
-            echoAnimation();
+            sparkAnimation();
             scoreAnimation();
         },
-        [rotationAnimation, scaleAnimation, echoAnimation, scoreAnimation]
+        [rotationAnimation, scaleAnimation, sparkAnimation, scoreAnimation]
     );
 
     const addEnergy = useCallback(() => {
@@ -405,21 +411,20 @@ export const FidgetSpinner = ({
         animateScore();
     }
 
-    function createEcho() {
-        const echo = document.createElement('div');
-        echo.textContent = expressions[Math.floor(Math.random() * expressions.length)];
+    function createSpark() {
+        const spark = document.createElement('div');
+        spark.textContent = expressions[Math.floor(Math.random() * expressions.length)];
 
-        echo.className = 'echo text-3xl';
-        echo.style.position = 'absolute';
-        echo.style.left = '50%';
-        echo.style.top = '50%';
-        echo.style.animation = 'none';
-        echo.style.opacity = '1';
+        spark.style.position = 'absolute';
+        spark.style.left = '50%';
+        spark.style.top = '50%';
+        spark.style.animation = 'none';
+        spark.style.opacity = '1';
         const startTime = Date.now();
-        const duration = 1000;
+        const duration = sparkConfig.durationMs;
         const maxDistance = Math.min(200 * (1 + Math.abs(angularVelocityRef.current) / 10), 600);
         const angle = Math.random() * 2 * Math.PI;
-        function moveEcho() {
+        function animateSpark() {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
@@ -429,18 +434,23 @@ export const FidgetSpinner = ({
 
             const opacity = 1 - progress;
 
-            echo.style.transform = `translate(${x - 50}%, ${y - 50}%)`;
-            echo.style.opacity = opacity.toString();
+            spark.style.transform = `translate(${x - 50}%, ${y - 50}%)`;
+            spark.style.opacity = opacity.toString();
 
             if (progress < 1) {
-                requestAnimationFrame(moveEcho);
+                requestAnimationFrame(animateSpark);
             }
         }
 
-        document.getElementById('container')?.appendChild(echo);
-        moveEcho();
+        document.getElementById('container')?.appendChild(spark);
+        sparkConfig.onSparkSpawn();
 
-        setTimeout(() => echo.remove(), duration);
+        animateSpark();
+
+        setTimeout(() => {
+            spark.remove();
+            sparkConfig.onSparkRemove();
+        }, duration);
     }
 
     const triggerMouseClickAnimation = (e: React.MouseEvent<HTMLDivElement>) => {
