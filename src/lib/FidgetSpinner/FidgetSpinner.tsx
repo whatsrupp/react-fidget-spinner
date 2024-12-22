@@ -341,7 +341,7 @@ export const FidgetSpinner = ({
 
     useAnimationFrame(animation);
 
-    const size = 2000;
+    const size = 500;
 
     function createScore() {
         const score = document.createElement('div');
@@ -476,8 +476,14 @@ export const FidgetSpinner = ({
                         cursor: 'pointer',
                         zIndex: 100,
                         overflow: 'hidden',
-                    }}></div>
+                    }}>
+                    <Goose />
+                </div>
             </div>
         </div>
     );
+};
+
+const Goose = () => {
+    return <div style={{userSelect: 'none', fontSize: '4rem'}}>🪿</div>;
 };
