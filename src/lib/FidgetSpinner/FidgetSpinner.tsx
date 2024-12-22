@@ -111,6 +111,9 @@ const resetConfig = {
 
 const clickConfig = {
     component: null,
+    durationMs: 300,
+    onClickSpawn: () => {},
+    onClickRemove: () => {},
 };
 
 export const FidgetSpinner = ({
@@ -466,13 +469,16 @@ export const FidgetSpinner = ({
         clickAnim.style.transition = 'all 0.3s ease-out';
         clickAnim.style.pointerEvents = 'none';
         document.body.appendChild(clickAnim);
-
+        clickConfig.onClickSpawn();
         requestAnimationFrame(() => {
             clickAnim.style.transform = 'translate(-50%, -50%) scale(1)';
             clickAnim.style.opacity = '0';
         });
 
-        setTimeout(() => clickAnim.remove(), 300);
+        setTimeout(() => {
+            clickAnim.remove();
+            clickConfig.onClickRemove();
+        }, clickConfig.durationMs);
     };
 
     return (
