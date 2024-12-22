@@ -1,7 +1,7 @@
 import {useCallback, useRef, useState} from 'react';
 import BezierEasing from 'bezier-easing';
 
-import {scores, expressions} from './constants';
+import {expressions, scores} from './constants';
 import {useAnimationFrame} from './useAnimationFrame';
 
 type FidgetSpinnerProps = {
@@ -13,15 +13,91 @@ type FidgetSpinnerProps = {
 };
 
 const thresholdConfig = [
-    // {threshold: 0.9, scale: 8},
-    // {threshold: 0.7, scale: 4},
-    // {threshold: 0.3, scale: 2}, //works well for 2rem
-    // {threshold: 0, scale: 1},
     {threshold: 0.9, scale: 3},
     {threshold: 0.7, scale: 2},
     {threshold: 0.3, scale: 1.5},
     {threshold: 0, scale: 1},
 ];
+
+const bubbleConfig = {
+    minSpawnInterval: 50,
+    maxSpawnInterval: 500,
+    components: scores,
+    durationMs: 1000,
+    maxDistance: 600,
+    minDistance: 200,
+    velocityEasing: [0.25, -0.75, 0.8, 1.2],
+    opacityEasing: [0.25, -0.75, 0.8, 1.2],
+    opacityStart: 1,
+    opacityEnd: 0,
+    startScale: 0.5,
+    endScale: 1,
+    wobbleFrequency: 0,
+    wobbleAmplitude: 0,
+    onSpawn: () => {
+        console.log('spawn');
+    },
+    onRemove: () => {
+        console.log('remove');
+    },
+};
+
+const sparkConfig = {
+    components: scores,
+    minSpawnIntervalMs: 50,
+    maxSpawnIntervalMs: 500,
+    durationMs: 1000,
+    maxDistancePx: 600,
+    minDistancePx: 200,
+    velocityEasing: [0.25, -0.75, 0.8, 1.2],
+    opacityEasing: [0.25, -0.75, 0.8, 1.2],
+    opacityStart: 1,
+    opacityEnd: 0,
+};
+
+const spinnerConfig = {
+    velocityBreakpoints: [
+        {breakpoint: 0.9, scale: 8},
+        {breakpoint: 0.7, scale: 4},
+        {breakpoint: 0.3, scale: 2},
+        {breakpoint: 0, scale: 1},
+    ],
+    maxVelocity: 10,
+    momentOfInertia: 0.5,
+    dampingCoefficient: 0.5,
+    initialAngle: 0,
+    initialAngularVelocity: 0,
+    maxAngularVelocity: Math.PI * 20,
+};
+
+const scalingConfig = {
+    onChange: (scale: number) => {
+        console.log('scale', scale);
+    },
+    onScaleStart: () => {
+        console.log('scale start');
+    },
+    onScaleEnd: () => {
+        console.log('scale end');
+    },
+    durationMs: 500,
+    easing: [0.25, -0.75, 0.8, 1.2],
+};
+
+const resetConfig = {
+    durationMs: 200,
+    onResetStart: () => {
+        console.log('reset start');
+    },
+    onResetEnd: () => {
+        console.log('reset end');
+    },
+    easing: [0.67, 0.03, 0.86, 0.49],
+};
+
+const clickConfig = {
+    component: null,
+};
 
 export const FidgetSpinner = ({
     dampingCoefficient = 0.5, // Reduced to make it spin longer
@@ -69,10 +145,8 @@ export const FidgetSpinner = ({
         if (!scaleStartTime || !scaleStartScale || !targetScale) {
             return;
         }
-        // const easing = BezierEasing(0.62, -0.33, 1, -0.62);
         const elapsedTime = performance.now() - scaleStartTime;
         const timeProgress = Math.min(elapsedTime / scaleTransitionTime, 1);
-        // const easing = BezierEasing(0, -0.36, 0, -0.73);
         const easing = BezierEasing(0.25, -0.75, 0.8, 1.2);
         const easedProgress = easing(timeProgress);
 
@@ -109,29 +183,24 @@ export const FidgetSpinner = ({
     const rotationAnimation = useCallback(
         (deltaTime: number) => {
             if (isResettingRef.current) {
-                // Define exact duration in milliseconds
-                const RESET_DURATION = 200; // 2 seconds
+                const RESET_DURATION = 200;
                 if (resetStartTimeRef.current === null) {
                     resetStartTimeRef.current = performance.now();
                 }
-                // Calculate progress based on elapsed time
                 const elapsedTime = performance.now() - resetStartTimeRef.current;
                 const timeProgress = Math.min(elapsedTime / RESET_DURATION, 1);
                 const easing = BezierEasing(0.67, 0.03, 0.86, 0.49);
                 const easedProgress = easing(timeProgress);
 
-                // Get the starting angle when reset began (using a ref)
                 if (resetStartAngleRef.current === null) {
                     resetStartAngleRef.current = angleRadiansRef.current;
                 }
 
                 const targetAngle = resetStartAngleRef.current < 0 ? -2 * Math.PI : 0;
 
-                // Interpolate between start and target angles
                 const newAngle =
                     resetStartAngleRef.current + (targetAngle - resetStartAngleRef.current) * easedProgress;
 
-                // Reset everything when animation is complete
                 if (timeProgress >= 1) {
                     resetState();
                     return;
@@ -156,7 +225,6 @@ export const FidgetSpinner = ({
 
             const scaleMultiplier = 1.5;
 
-            // Scale based on velocity thresholds
             const updateScaleBasedOnVelocity = ({
                 velocity,
                 maxVelocity,
@@ -219,13 +287,10 @@ export const FidgetSpinner = ({
         }
         const deltaTime = timestamp - lastEchoTimeRef.current;
 
-        // Calculate spawn interval based on velocity thresholds
         const velocity = angularVelocityRef.current;
         const velocityRatio = velocity / maxAngularVelocity;
-        const minInterval = 50; // Minimum time between echoes (ms)
-        const maxInterval = 500; // Maximum time between echoes (ms)
-
-        // Spawn interval gets shorter as velocity increases
+        const minInterval = 50;
+        const maxInterval = 500;
         const spawnInterval = maxInterval - (maxInterval - minInterval) * velocityRatio;
 
         if (deltaTime > spawnInterval && velocity > 0) {
@@ -243,13 +308,10 @@ export const FidgetSpinner = ({
         }
         const deltaTime = timestamp - lastScoreTimeRef.current;
 
-        // Calculate spawn interval based on velocity thresholds
         const velocity = angularVelocityRef.current;
         const velocityRatio = velocity / maxAngularVelocity;
-        const minInterval = 1000; // Minimum time between echoes (ms)
-        const maxInterval = 5000; // Maximum time between echoes (ms)
-
-        // Spawn interval gets shorter as velocity increases
+        const minInterval = 1000;
+        const maxInterval = 5000;
         const spawnInterval = maxInterval - (maxInterval - minInterval) * velocityRatio;
 
         if (deltaTime > spawnInterval && velocity > 0) {
@@ -273,7 +335,6 @@ export const FidgetSpinner = ({
             cancelReset();
         }
         const multiplier = 0.9;
-        // const multiplier = 1;
 
         angularVelocityRef.current = angularVelocityRef.current + Math.PI * 2 * multiplier;
     }, [cancelReset]);
@@ -292,33 +353,29 @@ export const FidgetSpinner = ({
         score.style.fontSize = '1rem';
 
         const startTime = Date.now();
-        const duration = 1500 + Math.random() * 1000; // Random duration between 1.5-2.5 seconds
-        const maxHeight = 100 + Math.random() * 200; // Random height between 150-250px
-        const wobbleAmplitude = 1 + Math.random() * 40; // Random amplitude between 20-50px
-        const wobbleFrequency = 0.1 + Math.random() * 0.5; // Random frequency between 1.5-3
+        const duration = 1500 + Math.random() * 1000;
+        const maxHeight = 100 + Math.random() * 200;
+        const wobbleAmplitude = 1 + Math.random() * 40;
+        const wobbleFrequency = 0.1 + Math.random() * 0.5;
         const randomXOffset = (Math.random() - 0.5) * 100;
-        const startScale = 0.5 + Math.random() * 0.5; // Random start scale between 0.5-1
-        const endScale = startScale + 0.5 + Math.random() * 0.2; // End scale 1-2 larger than start
+        const startScale = 0.5 + Math.random() * 0.5;
+        const endScale = startScale + 0.5 + Math.random() * 0.2;
 
         function animateScore() {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
-            // Ease out cubic for vertical movement
             const easeOutCubic = 1 - Math.pow(1 - progress, 3);
             const y = -maxHeight * easeOutCubic;
 
-            // Mix of sine and cosine waves with different frequencies for more random-feeling wobble
             const wobbleX =
                 Math.sin(progress * Math.PI * 2 * wobbleFrequency) * wobbleAmplitude * 0.6 +
                 Math.cos(progress * Math.PI * 3.7 * wobbleFrequency) * wobbleAmplitude * 0.4 +
                 Math.sin(progress * Math.PI * 5.3 * wobbleFrequency) * wobbleAmplitude * 0.2;
             const x = wobbleX + randomXOffset;
 
-            // Fade out in the last 30% of animation
             const opacity = progress > 0.7 ? 1 - (progress - 0.7) / 0.3 : 1;
 
-            // Scale animation
             const scale = startScale + (endScale - startScale) * easeOutCubic;
 
             score.style.transform = `translate(calc(${x}px - 50%), calc(${y}px - 50%)) scale(${scale})`;
@@ -337,7 +394,6 @@ export const FidgetSpinner = ({
 
     function createEcho() {
         const echo = document.createElement('div');
-        // echo.textContent = document.getElementById('flywheel').textContent;
         echo.textContent = expressions[Math.floor(Math.random() * expressions.length)];
 
         echo.className = 'echo text-3xl';
@@ -346,21 +402,18 @@ export const FidgetSpinner = ({
         echo.style.top = '50%';
         echo.style.animation = 'none';
         echo.style.opacity = '1';
-        // Add horizontal movement
         const startTime = Date.now();
-        const duration = 1000; // 1 second duration
-        const maxDistance = Math.min(200 * (1 + Math.abs(angularVelocityRef.current) / 10), 600); // Maximum distance in pixels, scales with velocity
+        const duration = 1000;
+        const maxDistance = Math.min(200 * (1 + Math.abs(angularVelocityRef.current) / 10), 600);
         const angle = Math.random() * 2 * Math.PI;
         function moveEcho() {
             const elapsed = Date.now() - startTime;
             const progress = Math.min(elapsed / duration, 1);
 
-            // Calculate x and y components based on angle
             const distance = progress * maxDistance;
             const x = Math.cos(angle) * distance;
             const y = Math.sin(angle) * distance;
 
-            // Fade opacity from 1 to 0 over the duration
             const opacity = 1 - progress;
 
             echo.style.transform = `translate(${x - 50}%, ${y - 50}%)`;
@@ -374,7 +427,6 @@ export const FidgetSpinner = ({
         document.getElementById('container')?.appendChild(echo);
         moveEcho();
 
-        // Remove the element after animation completes
         setTimeout(() => echo.remove(), duration);
     }
 
@@ -392,18 +444,16 @@ export const FidgetSpinner = ({
         clickAnim.style.pointerEvents = 'none';
         document.body.appendChild(clickAnim);
 
-        // Trigger animation
         requestAnimationFrame(() => {
             clickAnim.style.transform = 'translate(-50%, -50%) scale(1)';
             clickAnim.style.opacity = '0';
         });
 
-        // Cleanup
         setTimeout(() => clickAnim.remove(), 300);
     };
 
     return (
-        <div>
+        <div style={{cursor: 'pointer'}}>
             <div
                 id="container"
                 style={{
@@ -423,14 +473,10 @@ export const FidgetSpinner = ({
                         left: '50%',
                         top: '50%',
                         transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
-                        fontSize: '4rem',
                         cursor: 'pointer',
-                        userSelect: 'none',
                         zIndex: 100,
                         overflow: 'hidden',
-                    }}>
-                    🪿
-                </div>
+                    }}></div>
             </div>
         </div>
     );

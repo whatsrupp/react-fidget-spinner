@@ -1,53 +1,43 @@
-[![CI](https://github.com/morewings/react-library-template/actions/workflows/merge-jobs.yml/badge.svg)](https://github.com/morewings/react-library-template/actions/workflows/merge-jobs.yml)
-[![Storybook deploy](https://github.com/morewings/react-library-template/actions/workflows/pages.yml/badge.svg)](https://github.com/morewings/react-library-template/actions/workflows/pages.yml)
-[![Use this template](https://img.shields.io/badge/use%20this-template-blue?logo=githu)](https://github.com/morewings/react-library-template/generate)
+# React Fidget Spinner
 
-# React Library Template
+[![CI](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/merge-jobs.yml/badge.svg)](https://github.com/morewings/react-library-template/actions/workflows/merge-jobs.yml)
+[![Storybook deploy](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/pages.yml/badge.svg)](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/pages.yml)
 
+Turn any react component into a clickable fidget spinner.
 
-[![NPM library Create React App template logo](./design/logo.jpg)](#)
-
-With React Library Template Repository, you can focus on developing your React components and libraries without worrying about the configuration and setup.
-
-Read [full documentation](https://dev.to/morewings/fastest-way-to-create-a-react-library-3mi7).
-
-Visit [Demo Storybook](https://morewings.github.io/react-library-template/).
-
-## Features
-
-- Supports **Typescript** and **Javascript**.
-- Bundles `commonjs` and `es` module formats.
-- [pnpm](https://pnpm.io/) for blazing fast package management.
-- [Vite](https://vitejs.dev/) for speedy bundling
-- [Husky](https://github.com/typicode/husky) for git hooks.
-- [Eslint](https://eslint.org/) and [stylelint](https://stylelint.io/).
-- [Rollup](https://rollupjs.org/guide/en/) for bundling.
-- [Jest](https://jestjs.io/) and [react-testing-library](https://testing-library.com/docs/react-testing-library/intro) for testing.
-- [Storybook](https://storybook.js.org/) for documentation and demo.
-- Optional [Tailwind CSS](https://tailwindcss.com/) support.
+[![a silly goose](./design/goose.gif)](#)
+*not just this goose* 🪿
 
 ## Quickstart
 
-### Prerequisites
+1. Install
 
-1. Install **Node** >= 20.x.
-2. Install **pnpm**. E.g. `corepack prepare pnpm@latest --activate`.
-
-
-### Installation
-
-Manually clone repo or use `degit`.
-
-```shell script
-# With CSS Modules config
-npx degit github:morewings/react-library-template my-library
-# With Tailwind CSS config
-npx degit github:morewings/react-library-template#tailwind my-library
-cd ./my-library
-pnpm i
+```sh
+npm i react-fidget-spinner
 ```
 
+See interactive examples on [Storybook](https://whatsrupp.github.io/react-fidget-spinner).
 
-## Enable Tailwind CSS
+## Key Concepts
 
-You can find all changes at this [PR](https://github.com/morewings/react-library-template/pull/161) and [tailwind](https://github.com/morewings/react-library-template/tree/tailwind) branch.
+- Sparks
+- Bubbles
+- Flames
+- Spinner
+- Flywheel
+- Energy
+- Restting
+- Velocity Breakpoints
+
+## Motivations and Context
+
+I've wanted to publish an npm package for a while now but never had a good reason to. I don't think this is a _particularly_ good reason but it is quick and fun.
+
+I wanted to make the animations and experience heavily customisable so that people would be equipped to make the spinners as stupid as they want.
+
+I also wanted to model the fidget spinner in a way that was _somewhat_ realistic, I used concepts related to mechanical flywheels that I learnt about a while ago at uni.
+
+Each click on the spinner injects a burst of energy into the rotating flywheel. (sort of like flicking an actual fidget spinner)
+The spinner will then slow down based on various properties like inertia and friction.
+
+
