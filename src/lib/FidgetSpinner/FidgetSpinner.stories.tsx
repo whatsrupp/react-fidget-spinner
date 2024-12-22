@@ -1,6 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react';
 
 import {FidgetSpinner} from './FidgetSpinner';
+import {BubbleSpawner} from './Bubble';
 
 const meta = {
     title: 'Example/FidgetSpinner',
@@ -25,6 +26,16 @@ export const WithCode: Story = {
     render: args => {
         // here comes the code
         return <FidgetSpinner {...args} />;
+    },
+};
+
+export const BubbleSpawnerStory: Story = {
+    render: args => {
+        return (
+            <div style={{width: 500, height: 500, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                <BubbleSpawner {...args} />
+            </div>
+        );
     },
 };
 

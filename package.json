@@ -57,7 +57,8 @@
   },
   "dependencies": {
     "bezier-easing": "^2.1.0",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "usehooks-ts": "^3.1.0"
   },
   "devDependencies": {
     "@eslint/compat": "1.2.3",

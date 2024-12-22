@@ -1,9 +1,9 @@
 import {useCallback, useRef, useState} from 'react';
-import BezierEasing from 'bezier-easing';
 import ReactDOM from 'react-dom/client';
 
 import {expressions, scores} from './constants';
 import {useAnimationFrame} from './useAnimationFrame';
+import {toBezierEasing} from './toBezierEasing';
 
 const thresholdConfig = [
     {threshold: 0.9, scale: 3},
@@ -94,10 +94,6 @@ const spinnerConfig = {
             console.log('click');
         }
     },
-};
-
-const toBezierEasing = (easing: readonly [number, number, number, number]) => {
-    return BezierEasing(easing[0], easing[1], easing[2], easing[3]);
 };
 
 const scalingConfig = {
@@ -528,7 +524,7 @@ export const FidgetSpinner = () => {
         clickAnim.style.background = 'rgba(255,0,0,0.8)';
         clickAnim.style.borderRadius = '50%';
         clickAnim.style.transform = 'translate(-50%, -50%) scale(0)';
-        clickAnim.style.transition = 'all 0.3s ease-out';
+        clickAnim.style.transition = 'all 300ms ease-out';
         clickAnim.style.pointerEvents = 'none';
         document.body.appendChild(clickAnim);
         clickConfig.onClickSpawn();
@@ -553,6 +549,7 @@ export const FidgetSpinner = () => {
                     height: `${size}px`,
                     cursor: 'pointer',
                     backgroundColor: '#F3D173',
+                    userSelect: 'none',
                 }}>
                 <div
                     onClick={e => {
@@ -567,6 +564,7 @@ export const FidgetSpinner = () => {
                         cursor: 'pointer',
                         zIndex: 100,
                         overflow: 'hidden',
+                        userSelect: 'none',
                     }}>
                     <Goose />
                 </div>
