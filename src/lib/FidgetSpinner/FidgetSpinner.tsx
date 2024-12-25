@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom/client';
 import {expressions, scores} from './constants';
 import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
+import {BubbleSpawner} from './Bubble';
+import {SparkSpawner} from './Spark';
 
 const thresholdConfig = [
     {threshold: 0.9, scale: 3},
@@ -567,6 +569,12 @@ export const FidgetSpinner = () => {
                         userSelect: 'none',
                     }}>
                     <Goose />
+                </div>
+                <div style={{position: 'absolute', left: '50%', top: '50%'}}>
+                    <BubbleSpawner />
+                </div>
+                <div style={{position: 'absolute', left: '50%', top: '50%'}}>
+                    <SparkSpawner />
                 </div>
             </div>
         </div>
