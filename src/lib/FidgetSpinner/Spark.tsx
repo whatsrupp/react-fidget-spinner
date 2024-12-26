@@ -4,21 +4,34 @@ import {useDebounceCallback} from 'usehooks-ts';
 import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
 
-const FireEmoji = () => {
-    return <div>🔥</div>;
+type SparkSpawnerProps = {
+    components: readonly React.ReactNode[];
+    minSpawnIntervalMs: number;
+    maxSpawnIntervalMs: number;
+    durationMs: number;
+    maxDistancePx: number;
+    minDistancePx: number;
+    distanceStart: number;
+    distanceEasing: readonly [number, number, number, number];
+    opacityEasing: readonly [number, number, number, number];
+    opacityStart: number;
+    opacityEnd: number;
+    scaleEasing: readonly [number, number, number, number];
+    scaleStart: number;
+    scaleEnd: number;
+    onSpawn: () => void;
+    onRemove: () => void;
+    frameRate: number;
 };
 
-const RainbowEmoji = () => {
-    return <div>🌈</div>;
-};
-
-const sparkConfig = {
-    components: [FireEmoji, RainbowEmoji],
+const defaultSparkConfig: SparkSpawnerProps = {
+    components: ['💸', '🔥'],
     minSpawnIntervalMs: 50,
     maxSpawnIntervalMs: 500,
     durationMs: 1000,
     maxDistancePx: 600,
     minDistancePx: 200,
+    distanceStart: 0,
     distanceEasing: [0.25, 0, 0.8, 1.2],
     opacityEasing: [0.25, 0, 0.8, 1.2],
     opacityStart: 1,
@@ -26,18 +39,30 @@ const sparkConfig = {
     scaleEasing: [0.25, 0, 0.8, 1.2],
     scaleStart: 0.5,
     scaleEnd: 5,
-    onSpawn: () => {
-        console.log('spark spawn');
-    },
-    onRemove: () => {
-        console.log('spark remove');
-    },
-    frameRate: 24,
-    xStart: 0,
-    yStart: 0,
-} as const;
+    onSpawn: () => {},
+    onRemove: () => {},
+    frameRate: 50,
+};
 
-export const SparkSpawner = () => {
+export const SparkSpawner = ({
+    components = defaultSparkConfig.components,
+    minSpawnIntervalMs = defaultSparkConfig.minSpawnIntervalMs,
+    maxSpawnIntervalMs = defaultSparkConfig.maxSpawnIntervalMs,
+    durationMs = defaultSparkConfig.durationMs,
+    distanceStart = defaultSparkConfig.distanceStart,
+    maxDistancePx = defaultSparkConfig.maxDistancePx,
+    minDistancePx = defaultSparkConfig.minDistancePx,
+    distanceEasing = defaultSparkConfig.distanceEasing,
+    opacityEasing = defaultSparkConfig.opacityEasing,
+    opacityStart = defaultSparkConfig.opacityStart,
+    opacityEnd = defaultSparkConfig.opacityEnd,
+    scaleEasing = defaultSparkConfig.scaleEasing,
+    scaleStart = defaultSparkConfig.scaleStart,
+    scaleEnd = defaultSparkConfig.scaleEnd,
+    onSpawn = defaultSparkConfig.onSpawn,
+    onRemove = defaultSparkConfig.onRemove,
+    frameRate = defaultSparkConfig.frameRate,
+}: Partial<SparkSpawnerProps>) => {
     const [sparkMap, setSparkMap] = useState<Record<string, SparkProps>>({});
 
     const sparks = useMemo(() => {
@@ -63,9 +88,7 @@ export const SparkSpawner = () => {
     );
 
     const lastSpawnTime = useRef(performance.now());
-    const spawnInterval = useRef(sparkConfig.minSpawnIntervalMs as number);
-    const minSpawnInterval = sparkConfig.minSpawnIntervalMs;
-    const maxSpawnInterval = sparkConfig.maxSpawnIntervalMs;
+    const spawnInterval = useRef(minSpawnIntervalMs);
 
     const spawnLoop = useCallback(() => {
         const time = performance.now();
@@ -74,44 +97,61 @@ export const SparkSpawner = () => {
         if (elapsed > spawnInterval.current) {
             lastSpawnTime.current = time;
 
-            const newInterval = minSpawnInterval + Math.random() * (maxSpawnInterval - minSpawnInterval);
+            const newInterval = minSpawnIntervalMs + Math.random() * (maxSpawnIntervalMs - minSpawnIntervalMs);
             spawnInterval.current = newInterval;
 
             const id = Math.random().toString(36).substring(2, 15);
-            const SparkComponent = sparkConfig.components[Math.floor(Math.random() * sparkConfig.components.length)];
+            const SparkComponent = components[Math.floor(Math.random() * components.length)];
             const angleRadians = Math.random() * 2 * Math.PI;
+
+            const distanceEnd = distanceStart + Math.random() * (maxDistancePx - minDistancePx);
 
             const sparkProps: SparkProps = {
                 id,
-                durationMs: sparkConfig.durationMs,
-                frameRate: sparkConfig.frameRate,
-                opacityStart: sparkConfig.opacityStart,
-                opacityEnd: sparkConfig.opacityEnd,
-                opacityEasing: toBezierEasing(sparkConfig.opacityEasing),
-                distanceStart: 0,
-                distanceEnd: sparkConfig.maxDistancePx,
-                distanceEasing: toBezierEasing(sparkConfig.distanceEasing),
-                onSpawn: () => {
-                    sparkConfig.onSpawn();
-                },
-                onRemove: () => {
-                    sparkConfig.onRemove();
-                },
+                durationMs,
+                frameRate,
+                opacityStart,
+                opacityEnd,
+                opacityEasing: toBezierEasing(opacityEasing),
+                distanceStart,
+                distanceEnd,
+                distanceEasing: toBezierEasing(distanceEasing),
+                onSpawn,
+                onRemove,
                 cleanup: () => {
                     removeSpark(id);
                 },
-                xStart: 0,
-                yStart: 0,
                 angleRadians,
-                scaleStart: sparkConfig.scaleStart,
-                scaleEnd: sparkConfig.scaleEnd,
-                scaleEasing: toBezierEasing(sparkConfig.scaleEasing),
-                Component: <SparkComponent />,
+                scaleStart,
+                scaleEnd,
+                scaleEasing: toBezierEasing(scaleEasing),
+                Component: SparkComponent,
             };
 
             addSpark(id, sparkProps);
         }
-    }, [lastSpawnTime, addSpark, removeSpark, minSpawnInterval, maxSpawnInterval]);
+    }, [
+        lastSpawnTime,
+        addSpark,
+        removeSpark,
+        minSpawnIntervalMs,
+        maxSpawnIntervalMs,
+        components,
+        durationMs,
+        frameRate,
+        opacityStart,
+        opacityEnd,
+        opacityEasing,
+        maxDistancePx,
+        distanceEasing,
+        onSpawn,
+        onRemove,
+        scaleStart,
+        scaleEnd,
+        scaleEasing,
+        distanceStart,
+        minDistancePx,
+    ]);
 
     useAnimationFrame(spawnLoop, true);
 
@@ -141,8 +181,6 @@ type SparkProps = {
     onSpawn: () => void;
     onRemove: () => void;
     cleanup: () => void;
-    xStart: number;
-    yStart: number;
     Component: React.ReactNode;
 };
 
@@ -162,11 +200,13 @@ export const Spark = ({
     onSpawn,
     onRemove,
     cleanup,
-    xStart,
-    yStart,
     Component,
 }: SparkProps) => {
     const startTimestamp = useRef(performance.now());
+
+    const xStart = Math.cos(angleRadians) * distanceStart;
+    const yStart = Math.sin(angleRadians) * distanceStart;
+
     const x = useRef(xStart);
     const y = useRef(yStart);
     const scale = useRef(scaleStart);
