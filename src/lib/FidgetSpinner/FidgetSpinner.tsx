@@ -5,21 +5,43 @@ import {toBezierEasing} from './toBezierEasing';
 import {BubbleSpawner} from './Bubble';
 import {SparkSpawner} from './Spark';
 
-const thresholdConfig = [
-    {threshold: 0.9, scale: 3},
-    {threshold: 0.7, scale: 2},
-    {threshold: 0.3, scale: 1.5},
-    {threshold: 0, scale: 1},
-];
+type VelocityBreakpoint = {
+    breakpoint: number;
+    scale: number;
+};
 
-const spinnerConfig = {
+type FidgetSpinnerProps = {
+    velocityBreakpoints: VelocityBreakpoint[];
+    momentOfInertia: number;
+    dampingCoefficient: number;
+    initialAngle: number;
+    initialAngularVelocity: number;
+    maxAngularVelocity: number;
+    initialScale: number;
+    containerId: string;
+    debug: boolean;
+    onMaxAngularVelocity: () => void;
+    onClick: () => void;
+    scaleStart: number;
+    scaleEasing: [number, number, number, number];
+    scaleDurationMs: number;
+    onScaleChange: (scale: number) => void;
+    onScaleStart: () => void;
+    onScaleEnd: () => void;
+    onResetStart: () => void;
+    onResetEnd: () => void;
+    onResetCancel: () => void;
+    resetDurationMs: number;
+    resetEasing: [number, number, number, number];
+};
+
+const spinnerConfig: FidgetSpinnerProps = {
     velocityBreakpoints: [
         {breakpoint: 0.9, scale: 8},
         {breakpoint: 0.7, scale: 4},
         {breakpoint: 0.3, scale: 2},
         {breakpoint: 0, scale: 1},
     ],
-    maxVelocity: 10,
     momentOfInertia: 0.5,
     dampingCoefficient: 0.5,
     initialAngle: 0,
@@ -28,7 +50,7 @@ const spinnerConfig = {
     initialScale: 1,
     containerId: 'fidget-spinner-container',
     debug: true,
-    onMaxVelocity: () => {
+    onMaxAngularVelocity: () => {
         if (spinnerConfig.debug) {
             console.log('max velocity');
         }
@@ -38,46 +60,17 @@ const spinnerConfig = {
             console.log('click');
         }
     },
-};
-
-const scalingConfig = {
-    onScaleChange: (scale: number) => {
-        if (spinnerConfig.debug) {
-            console.log('scale change', scale);
-        }
-    },
-    onScaleStart: () => {
-        if (spinnerConfig.debug) {
-            console.log('scale start');
-        }
-    },
-    onScaleEnd: () => {
-        if (spinnerConfig.debug) {
-            console.log('scale end');
-        }
-    },
-    durationMs: 500,
-    easing: [0.25, -0.75, 0.8, 1.2] as const,
-};
-
-const resetConfig = {
-    durationMs: 200,
-    onResetStart: () => {
-        if (spinnerConfig.debug) {
-            console.log('reset start');
-        }
-    },
-    onResetEnd: () => {
-        if (spinnerConfig.debug) {
-            console.log('reset end');
-        }
-    },
-    onResetCancel: () => {
-        if (spinnerConfig.debug) {
-            console.log('reset cancel');
-        }
-    },
-    easing: [0.67, 0.03, 0.86, 0.49] as const,
+    scaleStart: 1,
+    scaleEasing: [0.25, -0.75, 0.8, 1.2],
+    scaleDurationMs: 500,
+    onScaleChange: () => {},
+    onScaleStart: () => {},
+    onScaleEnd: () => {},
+    onResetStart: () => {},
+    onResetEnd: () => {},
+    onResetCancel: () => {},
+    resetDurationMs: 200,
+    resetEasing: [0.67, 0.03, 0.86, 0.49],
 };
 
 const clickConfig = {
@@ -87,12 +80,27 @@ const clickConfig = {
     onClickRemove: () => {},
 };
 
-export const FidgetSpinner = () => {
-    const dampingCoefficient = spinnerConfig.dampingCoefficient;
-    const initialAngle = spinnerConfig.initialAngle;
-    const initialAngularVelocity = spinnerConfig.initialAngularVelocity;
-    const maxAngularVelocity = spinnerConfig.maxAngularVelocity;
-    const [angleRadians, setAngleRadians] = useState(initialAngle); // in radians
+export const FidgetSpinner = ({
+    velocityBreakpoints = spinnerConfig.velocityBreakpoints,
+    dampingCoefficient = spinnerConfig.dampingCoefficient,
+    initialAngle = spinnerConfig.initialAngle,
+    initialAngularVelocity = spinnerConfig.initialAngularVelocity,
+    maxAngularVelocity = spinnerConfig.maxAngularVelocity,
+    scaleStart = spinnerConfig.scaleStart,
+    scaleEasing = spinnerConfig.scaleEasing,
+    scaleDurationMs = spinnerConfig.scaleDurationMs,
+    onScaleChange = spinnerConfig.onScaleChange,
+    onScaleStart = spinnerConfig.onScaleStart,
+    onScaleEnd = spinnerConfig.onScaleEnd,
+    containerId = spinnerConfig.containerId,
+    onResetStart = spinnerConfig.onResetStart,
+    onResetEnd = spinnerConfig.onResetEnd,
+    onResetCancel = spinnerConfig.onResetCancel,
+    resetDurationMs = spinnerConfig.resetDurationMs,
+    resetEasing = spinnerConfig.resetEasing,
+    onMaxAngularVelocity: onMaxVelocity = spinnerConfig.onMaxAngularVelocity,
+}: Partial<FidgetSpinnerProps>) => {
+    const [angleRadians, setAngleRadians] = useState(initialAngle);
     const angleRadiansRef = useRef(initialAngle);
     const angularVelocityRef = useRef(initialAngularVelocity);
     const isResettingRef = useRef(false);
@@ -103,30 +111,33 @@ export const FidgetSpinner = () => {
     const initialScaleRef = useRef<number | null>(null);
     const targetScaleRef = useRef<number | null>(null);
     const isScalingRef = useRef(false);
-    const scaleRef = useRef(spinnerConfig.initialScale);
+    const scaleRef = useRef(scaleStart);
 
-    const [scale, setScale] = useState(spinnerConfig.initialScale);
+    const [scale, setScale] = useState(scaleStart);
     const [isActive, setIsActive] = useState(false);
 
-    const startScaling = useCallback(({newScale = 1}: {newScale?: number}) => {
-        scalingStartTimeRef.current = performance.now();
-        initialScaleRef.current = scaleRef.current;
-        targetScaleRef.current = newScale;
-        isScalingRef.current = true;
-        scalingConfig.onScaleStart();
-        scalingConfig.onScaleChange(newScale);
-    }, []);
+    const startScaling = useCallback(
+        ({newScale = 1}: {newScale?: number}) => {
+            scalingStartTimeRef.current = performance.now();
+            initialScaleRef.current = scaleRef.current;
+            targetScaleRef.current = newScale;
+            isScalingRef.current = true;
+            onScaleStart();
+            onScaleChange(newScale);
+        },
+        [onScaleStart, onScaleChange]
+    );
 
     const endScaling = useCallback(() => {
         scalingStartTimeRef.current = null;
         initialScaleRef.current = null;
         targetScaleRef.current = null;
         isScalingRef.current = false;
-        scalingConfig.onScaleEnd();
-    }, []);
+        onScaleEnd();
+    }, [onScaleEnd]);
 
     const scaleAnimation = useCallback(() => {
-        const scaleTransitionTime = scalingConfig.durationMs;
+        const scaleTransitionTime = scaleDurationMs;
 
         const scaleStartTime = scalingStartTimeRef.current;
         const scaleStartScale = initialScaleRef.current;
@@ -137,7 +148,7 @@ export const FidgetSpinner = () => {
         }
         const elapsedTime = performance.now() - scaleStartTime;
         const timeProgress = Math.min(elapsedTime / scaleTransitionTime, 1);
-        const easing = toBezierEasing(scalingConfig.easing);
+        const easing = toBezierEasing(scaleEasing);
         const easedProgress = easing(timeProgress);
 
         const newScale = scaleStartScale + (targetScale - scaleStartScale) * easedProgress;
@@ -147,7 +158,7 @@ export const FidgetSpinner = () => {
         if (timeProgress >= 1) {
             endScaling();
         }
-    }, [setScale, endScaling]);
+    }, [setScale, endScaling, scaleDurationMs, scaleEasing]);
 
     const resetState = useCallback(() => {
         setAngleRadians(initialAngle);
@@ -159,29 +170,28 @@ export const FidgetSpinner = () => {
     }, [initialAngle, initialAngularVelocity]);
 
     const beginReset = useCallback(() => {
-        resetConfig.onResetStart();
+        onResetStart();
         isResettingRef.current = true;
         resetStartTimeRef.current = performance.now();
         resetStartAngleRef.current = angleRadiansRef.current;
-    }, []);
+    }, [onResetStart]);
 
     const cancelReset = useCallback(() => {
         isResettingRef.current = false;
         resetStartTimeRef.current = null;
         resetStartAngleRef.current = null;
-        resetConfig.onResetCancel();
-    }, []);
+        onResetCancel();
+    }, [onResetCancel]);
 
     const rotationAnimation = useCallback(
         (deltaTime: number) => {
             if (isResettingRef.current) {
-                const RESET_DURATION = resetConfig.durationMs;
                 if (resetStartTimeRef.current === null) {
                     resetStartTimeRef.current = performance.now();
                 }
                 const elapsedTime = performance.now() - resetStartTimeRef.current;
-                const timeProgress = Math.min(elapsedTime / RESET_DURATION, 1);
-                const easing = toBezierEasing(resetConfig.easing);
+                const timeProgress = Math.min(elapsedTime / resetDurationMs, 1);
+                const easing = toBezierEasing(resetEasing);
                 const easedProgress = easing(timeProgress);
 
                 if (resetStartAngleRef.current === null) {
@@ -195,7 +205,7 @@ export const FidgetSpinner = () => {
 
                 if (timeProgress >= 1) {
                     resetState();
-                    resetConfig.onResetEnd();
+                    onResetEnd();
                     setIsActive(false);
                     return;
                 }
@@ -214,7 +224,7 @@ export const FidgetSpinner = () => {
             );
 
             if (newVelocity === maxAngularVelocity) {
-                spinnerConfig.onMaxVelocity();
+                onMaxVelocity();
             }
 
             const scaleMultiplier = 1.5;
@@ -234,8 +244,9 @@ export const FidgetSpinner = () => {
                 isScaling: boolean;
                 onScaleChange: (scale: number) => void;
             }) => {
-                for (const {threshold, scale} of thresholdConfig) {
-                    const targetScale = threshold === 1 ? velocity === maxVelocity : velocity > maxVelocity * threshold;
+                for (const {breakpoint, scale} of velocityBreakpoints) {
+                    const targetScale =
+                        breakpoint === 1 ? velocity === maxVelocity : velocity > maxVelocity * breakpoint;
 
                     if (targetScale) {
                         const newScale = scale * scaleMultiplier;
@@ -268,13 +279,23 @@ export const FidgetSpinner = () => {
 
             setAngleRadians(newAngle);
         },
-        [maxAngularVelocity, beginReset, resetState, startScaling, dampingCoefficient]
+        [
+            maxAngularVelocity,
+            beginReset,
+            resetState,
+            startScaling,
+            dampingCoefficient,
+            onMaxVelocity,
+            onResetEnd,
+            resetDurationMs,
+            resetEasing,
+            velocityBreakpoints,
+        ]
     );
 
     const animation = useCallback(
         (deltaTime: number) => {
             if (!isActive) return;
-
             rotationAnimation(deltaTime);
             scaleAnimation();
         },
@@ -297,7 +318,7 @@ export const FidgetSpinner = () => {
     return (
         <div style={{cursor: 'pointer'}}>
             <div
-                id={spinnerConfig.containerId}
+                id={containerId}
                 style={{
                     position: 'relative',
                     width: `${size}px`,
