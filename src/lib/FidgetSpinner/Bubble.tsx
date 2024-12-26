@@ -6,14 +6,43 @@ import {scores} from './constants';
 import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
 
-const bubbleConfig = {
+type BubbleSpawnerProps = {
+    minSpawnInterval: number;
+    maxSpawnInterval: number;
+    components: readonly string[];
+    durationMs: number;
+    durationMsRandomness: number;
+    yEnd: number;
+    yRandomness: number;
+    velocityEasing: readonly [number, number, number, number];
+    opacityEasing: readonly [number, number, number, number];
+    opacityStart: number;
+    opacityEnd: number;
+    startScale: number;
+    startScaleRandomness: number;
+    scaleEasing: readonly [number, number, number, number];
+    endScale: number;
+    endScaleRandomness: number;
+    wobbleFrequency: number;
+    wobbleFrequencyRandomness: number;
+    wobbleAmplitude: number;
+    wobbleAmplitudeRandomness: number;
+    xOffsetRandomness: number;
+    onSpawn: () => void;
+    onRemove: () => void;
+    yEasing: readonly [number, number, number, number];
+    yStart: number;
+    frameRate: number;
+};
+
+const defaultBubbleConfig = {
     minSpawnInterval: 1000,
     maxSpawnInterval: 5000,
     components: scores,
     durationMs: 1500,
     durationMsRandomness: 1000,
-    distance: 100,
-    distanceRandomness: 200,
+    yEnd: 100,
+    yRandomness: 200,
     velocityEasing: [0.25, 0, 0.8, 1.2],
     opacityEasing: [0.25, -0.75, 0.8, 1.2],
     opacityStart: 1,
@@ -28,20 +57,40 @@ const bubbleConfig = {
     wobbleAmplitude: 1,
     wobbleAmplitudeRandomness: 40,
     xOffsetRandomness: 100,
-    onSpawn: () => {
-        console.log('bubble spawn');
-    },
-    onRemove: () => {
-        console.log('bubble remove');
-    },
-    xWobble: ({timeMs}: {timeMs: number}) => {
-        return Math.sin(timeMs * bubbleConfig.wobbleFrequency) * bubbleConfig.wobbleAmplitude;
-    },
+    onSpawn: () => {},
+    onRemove: () => {},
     yEasing: [0.25, 0, 0.8, 1.2],
+    yStart: 0,
     frameRate: 60,
 } as const;
 
-export const BubbleSpawner = () => {
+export const BubbleSpawner = ({
+    minSpawnInterval = defaultBubbleConfig.minSpawnInterval,
+    maxSpawnInterval = defaultBubbleConfig.maxSpawnInterval,
+    components = defaultBubbleConfig.components,
+    durationMs = defaultBubbleConfig.durationMs,
+    durationMsRandomness = defaultBubbleConfig.durationMsRandomness,
+    opacityEasing = defaultBubbleConfig.opacityEasing,
+    opacityStart = defaultBubbleConfig.opacityStart,
+    opacityEnd = defaultBubbleConfig.opacityEnd,
+    startScale = defaultBubbleConfig.startScale,
+    startScaleRandomness = defaultBubbleConfig.startScaleRandomness,
+    scaleEasing = defaultBubbleConfig.scaleEasing,
+    endScale = defaultBubbleConfig.endScale,
+    endScaleRandomness = defaultBubbleConfig.endScaleRandomness,
+    wobbleFrequency = defaultBubbleConfig.wobbleFrequency,
+    wobbleFrequencyRandomness = defaultBubbleConfig.wobbleFrequencyRandomness,
+    wobbleAmplitude = defaultBubbleConfig.wobbleAmplitude,
+    wobbleAmplitudeRandomness = defaultBubbleConfig.wobbleAmplitudeRandomness,
+    xOffsetRandomness = defaultBubbleConfig.xOffsetRandomness,
+    onSpawn = defaultBubbleConfig.onSpawn,
+    onRemove = defaultBubbleConfig.onRemove,
+    yEasing = defaultBubbleConfig.yEasing,
+    frameRate = defaultBubbleConfig.frameRate,
+    yStart = defaultBubbleConfig.yStart,
+    yEnd = defaultBubbleConfig.yEnd,
+    yRandomness = defaultBubbleConfig.yRandomness,
+}: Partial<BubbleSpawnerProps>) => {
     const [bubbleMap, setBubbleMap] = useState<Record<string, BubbleProps>>({});
 
     const bubbles = useMemo(() => {
@@ -67,11 +116,9 @@ export const BubbleSpawner = () => {
     );
 
     const lastSpawnTime = useRef(performance.now());
-    const spawnInterval = useRef(bubbleConfig.minSpawnInterval as number);
-    const minSpawnInterval = bubbleConfig.minSpawnInterval;
-    const maxSpawnInterval = bubbleConfig.maxSpawnInterval;
+    const spawnInterval = useRef(minSpawnInterval);
 
-    const spawnLoop = () => {
+    const spawnLoop = useCallback(() => {
         const time = performance.now();
         const elapsed = time - lastSpawnTime.current;
 
@@ -81,12 +128,8 @@ export const BubbleSpawner = () => {
             const newInterval = minSpawnInterval + Math.random() * (maxSpawnInterval - minSpawnInterval);
             spawnInterval.current = newInterval;
 
-            const amplitude =
-                bubbleConfig.wobbleAmplitude +
-                Math.random() * (bubbleConfig.wobbleAmplitudeRandomness - bubbleConfig.wobbleAmplitude);
-            const frequency =
-                bubbleConfig.wobbleFrequency +
-                Math.random() * (bubbleConfig.wobbleFrequencyRandomness - bubbleConfig.wobbleFrequency);
+            const amplitude = wobbleAmplitude + Math.random() * (wobbleAmplitudeRandomness - wobbleAmplitude);
+            const frequency = wobbleFrequency + Math.random() * (wobbleFrequencyRandomness - wobbleFrequency);
 
             const xWobbleFunction = (timeMs: number) => {
                 const timeS = timeMs / 1000;
@@ -98,45 +141,73 @@ export const BubbleSpawner = () => {
                 return wobbleX;
             };
 
-            const xStart = Math.random() * bubbleConfig.xOffsetRandomness;
+            const xStart = Math.random() * xOffsetRandomness;
 
-            const durationMs = bubbleConfig.durationMs + Math.random() * bubbleConfig.durationMsRandomness;
-            const scaleStart = bubbleConfig.startScale + Math.random() * bubbleConfig.startScaleRandomness;
-            const scaleEnd = bubbleConfig.endScale + Math.random() * bubbleConfig.endScaleRandomness;
-            const scaleEasing = toBezierEasing(bubbleConfig.scaleEasing);
-            const opacityStart = bubbleConfig.opacityStart;
-            const opacityEnd = bubbleConfig.opacityEnd;
-            const opacityEasing = toBezierEasing(bubbleConfig.opacityEasing);
-            const yStart = 0;
-            const yEnd = -(bubbleConfig.distance + Math.random() * bubbleConfig.distanceRandomness);
-            const yEasing = toBezierEasing(bubbleConfig.yEasing);
+            const duration = durationMs + Math.random() * durationMsRandomness;
+            const scaleStart = startScale + Math.random() * startScaleRandomness;
+            const scaleEnd = endScale + Math.random() * endScaleRandomness;
+            const scaleEasingFn = toBezierEasing(scaleEasing);
+            const opacityEasingFn = toBezierEasing(opacityEasing);
+            const yMax = -(yEnd + Math.random() * yRandomness);
+            const yEasingFn = toBezierEasing(yEasing);
 
             const id = Math.random().toString(36).substring(2, 15);
-            const Component = bubbleConfig.components[Math.floor(Math.random() * bubbleConfig.components.length)];
+            const Component = components[Math.floor(Math.random() * components.length)];
 
             const bubbleProps: BubbleProps = {
                 id,
-                durationMs,
+                durationMs: duration,
                 scaleStart,
                 scaleEnd,
-                scaleEasing,
+                scaleEasing: scaleEasingFn,
                 opacityStart,
                 opacityEnd,
-                opacityEasing,
+                opacityEasing: opacityEasingFn,
                 yStart,
-                yEnd,
-                yEasing,
+                yEnd: yMax,
+                yEasing: yEasingFn,
                 xStart,
                 xWobbleFunction,
                 cleanup: () => {
                     removeBubble(id);
                 },
                 children: Component,
+                frameRate,
+                onSpawn,
+                onRemove,
             };
 
             addBubble(id, bubbleProps);
         }
-    };
+    }, [
+        minSpawnInterval,
+        maxSpawnInterval,
+        wobbleAmplitude,
+        wobbleAmplitudeRandomness,
+        wobbleFrequency,
+        wobbleFrequencyRandomness,
+        xOffsetRandomness,
+        durationMs,
+        durationMsRandomness,
+        startScale,
+        startScaleRandomness,
+        endScale,
+        endScaleRandomness,
+        scaleEasing,
+        opacityEasing,
+        opacityStart,
+        opacityEnd,
+        yEnd,
+        yRandomness,
+        yEasing,
+        yStart,
+        components,
+        frameRate,
+        onSpawn,
+        onRemove,
+        addBubble,
+        removeBubble,
+    ]);
 
     useAnimationFrame(spawnLoop, true);
 
@@ -164,7 +235,9 @@ type BubbleProps = PropsWithChildren<{
     xStart: number;
     xWobbleFunction: (timeMs: number) => number;
     cleanup: () => void;
-    frameRate?: number;
+    frameRate: number;
+    onSpawn: () => void;
+    onRemove: () => void;
 }>;
 
 export const Bubble = ({
@@ -181,8 +254,10 @@ export const Bubble = ({
     xStart,
     xWobbleFunction,
     cleanup,
-    frameRate = bubbleConfig.frameRate,
+    frameRate,
     children,
+    onSpawn,
+    onRemove,
 }: PropsWithChildren<BubbleProps>) => {
     const startTimestamp = useRef(performance.now());
     const scale = useRef(scaleStart);
@@ -204,12 +279,12 @@ export const Bubble = ({
     const [active, setActive] = useState(true);
 
     useEffect(() => {
-        bubbleConfig.onSpawn();
+        onSpawn();
 
         return () => {
-            bubbleConfig.onRemove();
+            onRemove();
         };
-    }, []);
+    }, [onSpawn, onRemove]);
 
     const animation = useCallback(() => {
         const elapsed = performance.now() - startTimestamp.current;
