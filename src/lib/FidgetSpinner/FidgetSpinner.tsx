@@ -73,13 +73,6 @@ const spinnerConfig: FidgetSpinnerProps = {
     resetEasing: [0.67, 0.03, 0.86, 0.49],
 };
 
-const clickConfig = {
-    component: null,
-    durationMs: 300,
-    onClickSpawn: () => {},
-    onClickRemove: () => {},
-};
-
 export const FidgetSpinner = ({
     velocityBreakpoints = spinnerConfig.velocityBreakpoints,
     dampingCoefficient = spinnerConfig.dampingCoefficient,
@@ -227,19 +220,15 @@ export const FidgetSpinner = ({
                 onMaxVelocity();
             }
 
-            const scaleMultiplier = 1.5;
-
             const updateScaleBasedOnVelocity = ({
                 velocity,
                 maxVelocity,
-                scaleMultiplier,
                 currentScale,
                 isScaling,
                 onScaleChange,
             }: {
                 velocity: number;
                 maxVelocity: number;
-                scaleMultiplier: number;
                 currentScale: number;
                 isScaling: boolean;
                 onScaleChange: (scale: number) => void;
@@ -249,7 +238,7 @@ export const FidgetSpinner = ({
                         breakpoint === 1 ? velocity === maxVelocity : velocity > maxVelocity * breakpoint;
 
                     if (targetScale) {
-                        const newScale = scale * scaleMultiplier;
+                        const newScale = scale;
                         if (currentScale !== newScale && !isScaling) {
                             onScaleChange(newScale);
                         }
@@ -261,7 +250,6 @@ export const FidgetSpinner = ({
             updateScaleBasedOnVelocity({
                 velocity: newVelocity,
                 maxVelocity: maxAngularVelocity,
-                scaleMultiplier,
                 currentScale: scaleRef.current,
                 isScaling: isScalingRef.current,
                 onScaleChange: newScale => startScaling({newScale}),
@@ -359,6 +347,12 @@ const Goose = () => {
     return <div style={{userSelect: 'none', fontSize: '4rem'}}>🪿</div>;
 };
 
+const clickConfig = {
+    component: null,
+    durationMs: 300,
+    onClickSpawn: () => {},
+    onClickRemove: () => {},
+};
 function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>) {
     const clickAnim = document.createElement('div');
     clickAnim.style.position = 'absolute';
