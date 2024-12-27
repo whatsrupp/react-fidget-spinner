@@ -76,8 +76,15 @@ export const FidgetSpinner = ({
 
         const breakpoint = sortedBreakpoints.find(breakpoint => velocityPercentage >= breakpoint.breakpoint);
 
-        return breakpoint;
+        return breakpoint || null;
     }, [sortedBreakpoints, spinnerConfig.maxAngularVelocity]);
+
+    const resetConfigs = useCallback(() => {
+        setSparkConfig(defaultSparkConfig);
+        setBubbleConfig(defaultBubbleConfig);
+        setScaleConfig(defaultScaleConfig);
+        setResetConfig(defaultResetConfig);
+    }, [defaultSparkConfig, defaultBubbleConfig, defaultScaleConfig, defaultResetConfig]);
 
     const startScaling = useCallback(
         ({newScale = 1}: {newScale?: number}) => {
@@ -195,8 +202,8 @@ export const FidgetSpinner = ({
             }
 
             const currentBreakpoint = getCurrentBreakpoint();
-
             if (currentBreakpoint && currentBreakpoint.breakpoint !== currentBreakpointConfigRef.current) {
+                console.log('updating breakpoint');
                 currentBreakpointConfigRef.current = currentBreakpoint?.breakpoint;
                 const newScaleConfig = currentBreakpoint?.config.scaleConfig;
                 if (newScaleConfig) {
@@ -218,6 +225,10 @@ export const FidgetSpinner = ({
                 if (newResetConfig) {
                     setResetConfig(newResetConfig);
                 }
+            } else if (!currentBreakpoint && currentBreakpointConfigRef.current !== null) {
+                currentBreakpointConfigRef.current = null;
+                startScaling({newScale: defaultScaleConfig.scale});
+                resetConfigs();
             }
 
             if (newVelocity < 2) {
@@ -232,7 +243,16 @@ export const FidgetSpinner = ({
 
             setAngleRadians(newAngle);
         },
-        [beginReset, resetState, startScaling, spinnerConfig, resetConfig, getCurrentBreakpoint]
+        [
+            beginReset,
+            resetState,
+            startScaling,
+            spinnerConfig,
+            resetConfig,
+            getCurrentBreakpoint,
+            resetConfigs,
+            defaultScaleConfig,
+        ]
     );
 
     const animation = useCallback(
