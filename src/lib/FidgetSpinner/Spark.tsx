@@ -3,66 +3,32 @@ import {useDebounceCallback} from 'usehooks-ts';
 
 import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
+import type {SparkConfig} from './SparkConfig';
+import {buildSparkConfig} from './SparkConfig';
 
-type SparkSpawnerProps = {
-    components: readonly React.ReactNode[];
-    minSpawnIntervalMs: number;
-    maxSpawnIntervalMs: number;
-    durationMs: number;
-    maxDistancePx: number;
-    minDistancePx: number;
-    distanceStart: number;
-    distanceEasing: readonly [number, number, number, number];
-    opacityEasing: readonly [number, number, number, number];
-    opacityStart: number;
-    opacityEnd: number;
-    scaleEasing: readonly [number, number, number, number];
-    scaleStart: number;
-    scaleEnd: number;
-    onSpawn: () => void;
-    onRemove: () => void;
-    frameRate: number;
-};
+export const SparkSpawner = (config: Partial<SparkConfig>) => {
+    const {
+        components,
+        minSpawnIntervalMs,
+        maxSpawnIntervalMs,
+        durationMs,
+        distanceStart,
+        maxDistancePx,
+        minDistancePx,
+        distanceEasing,
+        opacityEasing,
+        opacityStart,
+        opacityEnd,
+        scaleEasing,
+        scaleStart,
+        scaleEnd,
+        onSpawn,
+        onRemove,
+        frameRate,
+        active,
+        intensity,
+    } = buildSparkConfig(config);
 
-const defaultSparkConfig: SparkSpawnerProps = {
-    components: ['💸', '🔥'],
-    minSpawnIntervalMs: 50,
-    maxSpawnIntervalMs: 500,
-    durationMs: 1000,
-    maxDistancePx: 600,
-    minDistancePx: 200,
-    distanceStart: 0,
-    distanceEasing: [0.25, 0, 0.8, 1.2],
-    opacityEasing: [0.25, 0, 0.8, 1.2],
-    opacityStart: 1,
-    opacityEnd: 0,
-    scaleEasing: [0.25, 0, 0.8, 1.2],
-    scaleStart: 0.5,
-    scaleEnd: 5,
-    onSpawn: () => {},
-    onRemove: () => {},
-    frameRate: 50,
-};
-
-export const SparkSpawner = ({
-    components = defaultSparkConfig.components,
-    minSpawnIntervalMs = defaultSparkConfig.minSpawnIntervalMs,
-    maxSpawnIntervalMs = defaultSparkConfig.maxSpawnIntervalMs,
-    durationMs = defaultSparkConfig.durationMs,
-    distanceStart = defaultSparkConfig.distanceStart,
-    maxDistancePx = defaultSparkConfig.maxDistancePx,
-    minDistancePx = defaultSparkConfig.minDistancePx,
-    distanceEasing = defaultSparkConfig.distanceEasing,
-    opacityEasing = defaultSparkConfig.opacityEasing,
-    opacityStart = defaultSparkConfig.opacityStart,
-    opacityEnd = defaultSparkConfig.opacityEnd,
-    scaleEasing = defaultSparkConfig.scaleEasing,
-    scaleStart = defaultSparkConfig.scaleStart,
-    scaleEnd = defaultSparkConfig.scaleEnd,
-    onSpawn = defaultSparkConfig.onSpawn,
-    onRemove = defaultSparkConfig.onRemove,
-    frameRate = defaultSparkConfig.frameRate,
-}: Partial<SparkSpawnerProps>) => {
     const [sparkMap, setSparkMap] = useState<Record<string, SparkProps>>({});
 
     const sparks = useMemo(() => {
@@ -97,14 +63,16 @@ export const SparkSpawner = ({
         if (elapsed > spawnInterval.current) {
             lastSpawnTime.current = time;
 
-            const newInterval = minSpawnIntervalMs + Math.random() * (maxSpawnIntervalMs - minSpawnIntervalMs);
+            const intensityAdjustedRandom = Math.pow(Math.random(), intensity);
+            const newInterval =
+                minSpawnIntervalMs + intensityAdjustedRandom * (maxSpawnIntervalMs - minSpawnIntervalMs);
             spawnInterval.current = newInterval;
 
             const id = Math.random().toString(36).substring(2, 15);
             const SparkComponent = components[Math.floor(Math.random() * components.length)];
             const angleRadians = Math.random() * 2 * Math.PI;
 
-            const distanceEnd = distanceStart + Math.random() * (maxDistancePx - minDistancePx);
+            const distanceEnd = distanceStart + intensityAdjustedRandom * (maxDistancePx - minDistancePx);
 
             const sparkProps: SparkProps = {
                 id,
@@ -112,10 +80,10 @@ export const SparkSpawner = ({
                 frameRate,
                 opacityStart,
                 opacityEnd,
-                opacityEasing: toBezierEasing(opacityEasing),
+                opacityEasing,
                 distanceStart,
                 distanceEnd,
-                distanceEasing: toBezierEasing(distanceEasing),
+                distanceEasing,
                 onSpawn,
                 onRemove,
                 cleanup: () => {
@@ -124,7 +92,7 @@ export const SparkSpawner = ({
                 angleRadians,
                 scaleStart,
                 scaleEnd,
-                scaleEasing: toBezierEasing(scaleEasing),
+                scaleEasing,
                 Component: SparkComponent,
             };
 
@@ -151,9 +119,10 @@ export const SparkSpawner = ({
         scaleEasing,
         distanceStart,
         minDistancePx,
+        intensity,
     ]);
 
-    useAnimationFrame(spawnLoop, true);
+    useAnimationFrame(spawnLoop, active);
 
     return (
         <div style={{position: 'relative'}}>
@@ -171,13 +140,13 @@ type SparkProps = {
     angleRadians: number;
     scaleStart: number;
     scaleEnd: number;
-    scaleEasing: (timeMs: number) => number;
+    scaleEasing: [number, number, number, number];
     opacityStart: number;
     opacityEnd: number;
-    opacityEasing: (timeMs: number) => number;
+    opacityEasing: [number, number, number, number];
     distanceStart: number;
     distanceEnd: number;
-    distanceEasing: (timeMs: number) => number;
+    distanceEasing: [number, number, number, number];
     onSpawn: () => void;
     onRemove: () => void;
     cleanup: () => void;
@@ -237,13 +206,13 @@ export const Spark = ({
         const elapsed = performance.now() - startTimestamp.current;
         const progress = Math.min(elapsed / durationMs, 1);
 
-        const opacityProgress = opacityEasing(progress);
+        const opacityProgress = toBezierEasing(opacityEasing)(progress);
         opacity.current = opacityStart + (opacityEnd - opacityStart) * opacityProgress;
 
-        const scaleProgress = scaleEasing(progress);
+        const scaleProgress = toBezierEasing(scaleEasing)(progress);
         scale.current = scaleStart + (scaleEnd - scaleStart) * scaleProgress;
 
-        const distanceProgress = distanceEasing(progress);
+        const distanceProgress = toBezierEasing(distanceEasing)(progress);
         const distancePx = distanceStart + (distanceEnd - distanceStart) * distanceProgress;
 
         const angle = angleRadians;
