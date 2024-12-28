@@ -20,7 +20,6 @@ import {buildVelocityBreakpointConfigs} from './VelocityBreakpoints';
 type FidgetSpinnerProps = {
     velocityBreakpoints?: VelocityBreakpointConfigs;
     containerId?: string;
-    debug?: boolean;
     scaleConfig?: Partial<ScaleConfig>;
     resetConfig?: Partial<ResetConfig>;
     bubbleConfig?: Partial<BubbleConfig>;
@@ -275,41 +274,34 @@ export const FidgetSpinner = ({
 
     useAnimationFrame(animation);
 
-    const size = 500;
-
     return (
-        <div style={{cursor: 'pointer'}}>
+        <div
+            id={containerId}
+            style={{
+                position: 'relative',
+                cursor: 'pointer',
+                userSelect: 'none',
+            }}>
             <div
-                id={containerId}
+                onClick={e => {
+                    addEnergy();
+                    triggerMouseClickAnimation(e);
+                }}
                 style={{
-                    position: 'relative',
-                    width: `${size}px`,
-                    height: `${size}px`,
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
                     cursor: 'pointer',
-                    backgroundColor: '#F3D173',
+                    zIndex: 100,
+                    overflow: 'hidden',
                     userSelect: 'none',
                 }}>
-                <div
-                    onClick={e => {
-                        addEnergy();
-                        triggerMouseClickAnimation(e);
-                    }}
-                    style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '50%',
-                        transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
-                        cursor: 'pointer',
-                        zIndex: 100,
-                        overflow: 'hidden',
-                        userSelect: 'none',
-                    }}>
-                    <Goose />
-                </div>
-                <div style={{position: 'absolute', left: '50%', top: '50%'}}>
-                    <BubbleSpawner {...bubbleConfig} active={isActive} />
-                    <SparkSpawner {...sparkConfig} active={isActive} />
-                </div>
+                <Goose />
+            </div>
+            <div style={{position: 'absolute', left: '50%', top: '50%'}}>
+                <BubbleSpawner {...bubbleConfig} active={isActive} />
+                <SparkSpawner {...sparkConfig} active={isActive} />
             </div>
         </div>
     );

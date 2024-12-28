@@ -1,15 +1,25 @@
 import type {Meta, StoryObj} from '@storybook/react';
 
 import {FidgetSpinner} from './FidgetSpinner';
-import {BubbleSpawner} from './Bubble';
-import {SparkSpawner} from './Spark';
+import {buildScaleConfig} from './ScaleConfig';
+import {buildResetConfig} from './ResetConfig';
+import {buildBubbleConfig} from './BubbleConfig';
+import {buildSparkConfig} from './SparkConfig';
+import {buildSpinnerConfig} from './SpinnerConfig';
+import {buildVelocityBreakpointConfigs} from './VelocityBreakpoints';
+
+const args = {
+    scaleConfig: buildScaleConfig({}),
+    resetConfig: buildResetConfig({}),
+    bubbleConfig: buildBubbleConfig({}),
+    sparkConfig: buildSparkConfig({}),
+    spinnerConfig: buildSpinnerConfig({}),
+    velocityBreakpoints: buildVelocityBreakpointConfigs(),
+};
+
 const meta = {
-    title: 'Example/FidgetSpinner',
+    title: 'Spinner/FidgetSpinner',
     component: FidgetSpinner,
-    parameters: {
-        // More on how to position stories at: https://storybook.js.org/docs/react/configure/story-layout
-        layout: 'fullscreen',
-    },
 } as Meta<typeof FidgetSpinner>;
 
 export default meta;
@@ -19,45 +29,5 @@ export const Primary: Story = {
     render: args => {
         return <FidgetSpinner {...args} />;
     },
-    args: {},
-};
-
-export const WithCode: Story = {
-    render: args => {
-        // here comes the code
-        return <FidgetSpinner {...args} />;
-    },
-};
-
-export const BubbleSpawnerStory: Story = {
-    render: args => {
-        return (
-            <div style={{width: 500, height: 500, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                <BubbleSpawner {...args} />
-            </div>
-        );
-    },
-};
-
-export const SparkSpawnerStory: Story = {
-    render: args => {
-        return (
-            <div style={{width: 500, height: 500, display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                <SparkSpawner {...args} />
-            </div>
-        );
-    },
-};
-
-WithCode.args = {};
-
-WithCode.argTypes = {};
-
-WithCode.parameters = {
-    docs: {
-        source: {
-            language: 'tsx',
-            type: 'code',
-        },
-    },
+    args,
 };
