@@ -1,1 +1,3 @@
-export {FidgetSpinner} from './FidgetSpinner.tsx';
+export {FidgetSpinner} from './FidgetSpinner';
+export {SparkSpawner} from './Spark';
+export {BubbleSpawner} from './Bubble';

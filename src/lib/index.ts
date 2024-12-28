@@ -1,1 +1,1 @@
-export {Counter} from './CounterDemo';
+export {FidgetSpinner} from './FidgetSpinner';
