@@ -120,6 +120,5 @@ export const buildBubbleConfig = (bubbleConfigOverrides: Partial<BubbleConfig> =
         ...defaultBubbleConfig,
         ...bubbleConfigOverrides,
     };
-    console.log('input', input);
     return v.parse(BubbleConfigSchema, input);
 };

@@ -64,7 +64,7 @@ export const SparkConfigSchema = v.object({
 });
 
 export const defaultSparkConfig: SparkConfig = {
-    active: false,
+    active: true,
     components: ['💸', '🔥'],
     distanceEasing: [0.25, 0, 0.8, 1.2],
     distanceStart: 0,

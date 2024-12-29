@@ -249,7 +249,6 @@ export const FidgetSpinner = ({
 
             const currentBreakpoint = getCurrentBreakpoint();
             if (currentBreakpoint && currentBreakpoint.breakpoint !== currentBreakpointConfigRef.current) {
-                console.log('updating breakpoint');
                 currentBreakpointConfigRef.current = currentBreakpoint?.breakpoint;
                 const newScaleConfig = currentBreakpoint?.config.scaleConfig;
                 if (newScaleConfig) {
