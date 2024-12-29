@@ -1,0 +1,65 @@
+import { Meta, ArgTypes, Story, Canvas, Source, Markdown, Primary } from "@storybook/blocks";
+
+<Meta title="Welcome" />
+
+# 🪿 React Fidget Spinner
+
+[![a silly goose](../../design/goose.gif)](#)
+
+Turn your react components into high speed interactive widgets.
+
+## Quickstart
+
+```bash
+npm i react-fidget-spinner
+```
+
+```jsx
+import {FidgetSpinner} from "react-fidget-spinner"
+
+
+const MyFidgetSpinner = () => {
+
+    return (
+        <FidgetSpinner>
+            <MyComponent> <-- This now spins when you click it
+        </FidgetSpinner>
+    )
+}
+```
+
+## Using These Docs
+
+Each exported component has a docs page and a primary example.
+
+- The docs page will give an overview ot the component and its props.
+- The primary example acts as an interactive playground.
+
+The config for these components are often stored in objects, which doesn't work so well with storybook.
+The arguments for the primary example are also the default config for that component.
+
+
+## Features
+
+- 🎡 Physics-based flywheel spinner animation and interaction
+- ✨ Spark Particles
+- 🫧 Bubble Particles
+- 💥 Click Animation
+- 🦣 Scaling Animation
+- 🏎️ Velocity Breakpoints - Change your configuration based on the velocity of the spinner.
+- 🎨 Highly customisable animations with full defaults to get you started
+- 🔫 Triggers for all key events
+
+
+## Design Paradigms
+
+- Provide solid defaults but allow full customisation
+- Animations should be as separate as possible (They might be useful on their own)
+- Don't run animation code unless necessary
+- Interactions should be fun and satisfying
+- Make it quick to add fun ontop of existing react components
+- Design interactions using real life physics where possible
+
+
+
+
