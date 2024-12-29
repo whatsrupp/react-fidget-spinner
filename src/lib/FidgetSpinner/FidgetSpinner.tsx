@@ -340,7 +340,6 @@ export const FidgetSpinner = ({
                     transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
                     cursor: 'pointer',
                     zIndex: 100,
-                    overflow: 'hidden',
                     userSelect: 'none',
                 }}>
                 {children}
