@@ -33,7 +33,7 @@
     "css-modules",
     "typescript"
   ],
-  "description": "Missing React, typescript NPM library creation template",
+  "description": "Turn any React component into an interactive clickable fidget spinner! 🪿",
   "scripts": {
     "dev": "vite",
     "clean:lib": "rm -rf dist",
