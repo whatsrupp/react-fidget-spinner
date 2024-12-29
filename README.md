@@ -10,34 +10,54 @@ Turn any react component into a clickable fidget spinner.
 
 ## Quickstart
 
-1. Install
-
-```sh
+```bash
 npm i react-fidget-spinner
 ```
 
-See interactive examples on [Storybook](https://whatsrupp.github.io/react-fidget-spinner).
-
-## Key Concepts
-
-- Sparks
-- Bubbles
-- Flames
-- Spinner
-- Flywheel
-- Energy
-- Restting
-- Velocity Breakpoints
-
-## Motivations and Context
-
-I've wanted to publish an npm package for a while now but never had a good reason to. I don't think this is a _particularly_ good reason but it is quick and fun.
-
-I wanted to make the animations and experience heavily customisable so that people would be equipped to make the spinners as stupid as they want.
-
-I also wanted to model the fidget spinner in a way that was _somewhat_ realistic, I used concepts related to mechanical flywheels that I learnt about a while ago at uni.
-
-Each click on the spinner injects a burst of energy into the rotating flywheel. (sort of like flicking an actual fidget spinner)
-The spinner will then slow down based on various properties like inertia and friction.
+```jsx
+import {FidgetSpinner} from "react-fidget-spinner"
 
 
+const MyFidgetSpinner = () => {
+
+    return (
+        <FidgetSpinner>
+            <MyComponent> <-- This now spins when you click it
+        </FidgetSpinner>
+    )
+}
+```
+
+## Where are the full docs?
+
+Full docs and, more importantly(!), *interactive and clickable* examples on [Storybook](https://whatsrupp.github.io/react-fidget-spinner).
+
+## Features
+
+- 🎡 Physics-based flywheel spinner animation and interaction
+- ✨ Spark Particles
+- 🫧 Bubble Particles
+- 💥 Click Animation
+- 🦣 Scaling Animation
+- 🏎️ Velocity Breakpoints - Change your configuration based on the velocity of the spinner.
+- 🎨 Highly customisable animations with full defaults to get you started
+- 🔫 Callback triggers for all key events
+
+## Context
+
+Adding fun or little easter eggs into projects is often overlooked and can often not perceived to be worth the time investment from a business (or even personal) perspective.
+
+But Users often _love_ and sometimes remember these little interactions.
+
+Inspired by [react-confetti](https://www.npmjs.com/package/react-confetti) which made fun easy for me, I thought it could be a nice short project to build something light and interactive that other people might be able to use. So, here it is a silly component that turns whatever you want into a spinning interactive widget.
+
+I also took this as a nice opportunity to publish my first public npm package and learn a bit more about storybook (which I really enjoyed, especially given how the entire value of the component comes from interacting with the spinner live)
+
+## Shoutouts
+
+- [react-library-template](https://github.com/morewings/react-library-template) - I used this as a starting point for this project. It was a really painless way of publishing an npm package that was backed by good docs with storybook. Thank you [morewings](https://github.com/morewings)
+- [react-confetti](https://www.npmjs.com/package/react-confetti)
+
+## Contibuting
+
+- Feel free to open issues, send me a message or submit a PR and I will try and respond ❤️
