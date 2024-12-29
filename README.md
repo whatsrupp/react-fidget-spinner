@@ -5,7 +5,7 @@
 
 Turn any react component into a clickable fidget spinner.
 
-[![a silly goose](./design/goose.gif)](#)
+[![a silly goose](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXFtdWc1eDVxcGd6dzMzbTI2ejV5bm1nbXZqa2w2cDRlM3VnZDZzeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/p00fPNBjCUAKqogAyr/giphy.gif)](#)
 *not just this goose* 🪿
 
 ## Quickstart
