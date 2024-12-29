@@ -3,7 +3,7 @@ import {useCallback, useMemo, useRef, useState} from 'react';
 import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
 import {BubbleSpawner} from './Bubble';
-import {SparkSpawner} from './Spark';
+import {SparkSpawner} from './Sparks';
 import type {SpinnerConfig} from './SpinnerConfig';
 import {buildSpinnerConfig} from './SpinnerConfig';
 import type {ScaleConfig} from './ScaleConfig';

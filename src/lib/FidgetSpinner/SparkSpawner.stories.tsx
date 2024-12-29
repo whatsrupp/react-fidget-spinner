@@ -1,6 +1,6 @@
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {SparkSpawner} from './Spark';
+import {SparkSpawner} from './Sparks';
 import {buildSparkConfig} from './SparkConfig';
 
 const meta = {
