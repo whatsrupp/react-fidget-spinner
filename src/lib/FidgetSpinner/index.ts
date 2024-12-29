@@ -1,3 +1,3 @@
 export {FidgetSpinner} from './FidgetSpinner';
-export {SparkSpawner} from './Sparks';
-export {BubbleSpawner} from './Bubble';
+export {Sparks} from './Sparks';
+export {Bubbles} from './Bubbles';

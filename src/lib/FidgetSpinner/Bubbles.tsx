@@ -7,7 +7,7 @@ import {toBezierEasing} from './toBezierEasing';
 import type {BubbleConfig} from './BubbleConfig';
 import {buildBubbleConfig} from './BubbleConfig';
 
-export const BubbleSpawner = (config: Partial<BubbleConfig>) => {
+export const Bubbles = (config: Partial<BubbleConfig>) => {
     const {
         minSpawnInterval,
         maxSpawnInterval,
@@ -292,4 +292,4 @@ export const Bubble = ({
     );
 };
 
-export default BubbleSpawner;
+export default Bubbles;

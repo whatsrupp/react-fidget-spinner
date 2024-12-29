@@ -2,8 +2,8 @@ import {useCallback, useMemo, useRef, useState} from 'react';
 
 import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
-import {BubbleSpawner} from './Bubble';
-import {SparkSpawner} from './Sparks';
+import {Bubbles} from './Bubbles';
+import {Sparks} from './Sparks';
 import type {SpinnerConfig} from './SpinnerConfig';
 import {buildSpinnerConfig} from './SpinnerConfig';
 import type {ScaleConfig} from './ScaleConfig';
@@ -300,8 +300,8 @@ export const FidgetSpinner = ({
                 <Goose />
             </div>
             <div style={{position: 'absolute', left: '50%', top: '50%'}}>
-                <BubbleSpawner {...bubbleConfig} active={isActive} />
-                <SparkSpawner {...sparkConfig} active={isActive} />
+                <Bubbles {...bubbleConfig} active={isActive} />
+                <Sparks {...sparkConfig} active={isActive} />
             </div>
         </div>
     );

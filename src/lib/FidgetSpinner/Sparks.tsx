@@ -6,7 +6,7 @@ import {toBezierEasing} from './toBezierEasing';
 import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 
-export const SparkSpawner = (config: Partial<SparkConfig>) => {
+export const Sparks = (config: Partial<SparkConfig>) => {
     const {
         components,
         minSpawnIntervalMs,

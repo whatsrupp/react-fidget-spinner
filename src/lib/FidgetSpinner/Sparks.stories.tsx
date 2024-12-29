@@ -1,19 +1,19 @@
 import type {Meta, StoryObj} from '@storybook/react';
 
-import {SparkSpawner} from './Sparks';
+import {Sparks} from './Sparks';
 import {buildSparkConfig} from './SparkConfig';
 
 const meta = {
-    title: 'Sparks/SparkSpawner',
-    component: SparkSpawner,
-} as Meta<typeof SparkSpawner>;
+    title: 'Particles/Sparks',
+    component: Sparks,
+} as Meta<typeof Sparks>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
     render: args => {
-        return <SparkSpawner {...args} />;
+        return <Sparks {...args} />;
     },
     args: buildSparkConfig({active: true}),
 };
