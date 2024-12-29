@@ -22,7 +22,7 @@ const MyFidgetSpinner = () => {
 
     return (
         <FidgetSpinner>
-            <MyComponent> <-- This now spins when you click it
+            <MyComponent>
         </FidgetSpinner>
     )
 }
@@ -61,3 +61,16 @@ I also took this as a nice opportunity to publish my first public npm package an
 ## Contibuting
 
 - Feel free to open issues, send me a message or submit a PR and I will try and respond ❤️
+
+## Roadmap
+
+Further work into this project could include things like but I'll only do these if there's interest in the project:
+
+- [ ] Explore testing with animations
+- [ ] Throttling of animations
+- [ ] Make it clearer that the component is interactive, maybe a shake?
+- [ ] Linear scaling of effects based on speeds instead of breakpoints
+- [ ] Validation of inputs properly
+- [ ] Scoring
+- [ ] Exposing things like current speed via refs
+- [ ] Explosions at max speed
