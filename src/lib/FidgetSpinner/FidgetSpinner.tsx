@@ -1,3 +1,4 @@
+import type {PropsWithChildren} from 'react';
 import {useCallback, useMemo, useRef, useState} from 'react';
 
 import {useAnimationFrame} from './useAnimationFrame';
@@ -14,35 +15,81 @@ import type {BubbleConfig} from './BubbleConfig';
 import {buildBubbleConfig} from './BubbleConfig';
 import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
-import type {VelocityBreakpointConfigs} from './VelocityBreakpoints';
-import {buildVelocityBreakpointConfigs} from './VelocityBreakpoints';
+import type {VelocityBreakpoints} from './VelocityBreakpoints';
+import {buildVelocityBreakpoints} from './VelocityBreakpoints';
 
 type FidgetSpinnerProps = {
-    velocityBreakpoints?: VelocityBreakpointConfigs;
-    containerId?: string;
-    scaleConfig?: Partial<ScaleConfig>;
-    resetConfig?: Partial<ResetConfig>;
+    /** Configuration that gets passed to the underlying `Bubbles` particle spawner component*/
     bubbleConfig?: Partial<BubbleConfig>;
+    /** Id passed to the outermost div that wraps `children` */
+    containerId?: string;
+    /** Configuration for the resetting animation */
+    resetConfig?: Partial<ResetConfig>;
+    /** Configuration for the animation that happens when the FidgetSpinner changes in size */
+    scaleConfig?: Partial<ScaleConfig>;
+    /** Configuration that gets passed to the underlying `Sparks` particle spawner component*/
     sparkConfig?: Partial<SparkConfig>;
+    /** Configuration for the flywheel physics of the `FidgetSpinner` */
     spinnerConfig?: Partial<SpinnerConfig>;
+    /** An array of configuration changes that trigger when the velocity of the fidget spinner gets to `x%` of its `maxAngularVelocity` */
+    velocityBreakpoints?: VelocityBreakpoints;
 };
 
+/**
+ *
+ * ## Basic Usage
+ * Turns `children` into a clickable interactive fidget spinner:
+ *
+ * - Each click adds energy which makes it spin faster
+ * - It will then slow down and eventually trigger a reset animation.
+ *
+ *
+ * ```tsx
+ * <FidgetSpinner>
+ *     <YourComponent />
+ * </FidgetSpinner>
+ * ```
+ *
+ *
+ * ## Config Overrides
+ * Any props passed through to the `FidgetSpinner` will **shallow merge** with the default values.
+ *
+ * ```tsx
+ * <FidgetSpinner scaleConfig={{scale: 2}}>
+ *     <YourComponent />
+ * </FidgetSpinner>
+ * ```
+ *
+ *
+ * ## Complex Configuration
+ * config builder functions are exported at the top level to help build out more complex configuration. Eg, when using velocity breakpoints.
+ *
+ *
+ * ```tsx
+ * // eg for scale config which controls the size of the spinner
+ * import { buildScaleConfig } from './react-fidget-spinnner';
+ * ```
+ *
+ * ## What are the default configuration values?
+ * Each `control` visible in storybook is the `default` value for that prop.
+ */
 export const FidgetSpinner = ({
-    scaleConfig: scaleConfigOverrides,
-    resetConfig: resetConfigOverrides,
     bubbleConfig: bubbleConfigOverrides,
-    sparkConfig: sparkConfigOverrides,
+    children,
     containerId = 'fidget-spinner-container',
+    resetConfig: resetConfigOverrides,
+    scaleConfig: scaleConfigOverrides,
+    sparkConfig: sparkConfigOverrides,
     spinnerConfig: spinnerConfigOverrides,
     velocityBreakpoints: velocityBreakpointsOverrides,
-}: FidgetSpinnerProps) => {
+}: PropsWithChildren<FidgetSpinnerProps>) => {
     const spinnerConfig = buildSpinnerConfig(spinnerConfigOverrides);
     const defaultScaleConfig = buildScaleConfig(scaleConfigOverrides);
     const defaultResetConfig = buildResetConfig(resetConfigOverrides);
     const defaultBubbleConfig = buildBubbleConfig(bubbleConfigOverrides);
     const defaultSparkConfig = buildSparkConfig(sparkConfigOverrides);
 
-    const velocityBreakpoints: VelocityBreakpointConfigs = buildVelocityBreakpointConfigs(velocityBreakpointsOverrides);
+    const velocityBreakpoints: VelocityBreakpoints = buildVelocityBreakpoints(velocityBreakpointsOverrides);
 
     const [scaleConfig, setScaleConfig] = useState(defaultScaleConfig);
     const [resetConfig, setResetConfig] = useState(defaultResetConfig);
@@ -297,7 +344,7 @@ export const FidgetSpinner = ({
                     overflow: 'hidden',
                     userSelect: 'none',
                 }}>
-                <Goose />
+                {children}
             </div>
             <div style={{position: 'absolute', left: '50%', top: '50%'}}>
                 <Bubbles {...bubbleConfig} active={isActive} />
@@ -305,10 +352,6 @@ export const FidgetSpinner = ({
             </div>
         </div>
     );
-};
-
-const Goose = () => {
-    return <div style={{userSelect: 'none', fontSize: '4rem'}}>🪿</div>;
 };
 
 const clickConfig = {

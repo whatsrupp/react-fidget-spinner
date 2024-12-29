@@ -9,8 +9,8 @@ import {buildBubbleConfig} from './BubbleConfig';
 
 export const Bubbles = (config: Partial<BubbleConfig>) => {
     const {
-        minSpawnInterval,
-        maxSpawnInterval,
+        minSpawnIntervalMs,
+        maxSpawnIntervalMs,
         components,
         durationMs,
         durationMsRandomness,
@@ -62,7 +62,7 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
     );
 
     const lastSpawnTime = useRef(performance.now());
-    const spawnInterval = useRef(minSpawnInterval);
+    const spawnInterval = useRef(minSpawnIntervalMs);
 
     const spawnLoop = useCallback(() => {
         const time = performance.now();
@@ -71,7 +71,7 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
         if (elapsed > spawnInterval.current) {
             lastSpawnTime.current = time;
 
-            const newInterval = minSpawnInterval + Math.random() * (maxSpawnInterval - minSpawnInterval);
+            const newInterval = minSpawnIntervalMs + Math.random() * (maxSpawnIntervalMs - minSpawnIntervalMs);
             spawnInterval.current = newInterval;
 
             const amplitude = wobbleAmplitude + Math.random() * (wobbleAmplitudeRandomness - wobbleAmplitude);
@@ -126,8 +126,8 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
             addBubble(id, bubbleProps);
         }
     }, [
-        minSpawnInterval,
-        maxSpawnInterval,
+        minSpawnIntervalMs,
+        maxSpawnIntervalMs,
         wobbleAmplitude,
         wobbleAmplitudeRandomness,
         wobbleFrequency,

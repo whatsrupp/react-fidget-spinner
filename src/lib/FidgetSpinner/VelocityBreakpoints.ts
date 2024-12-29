@@ -22,8 +22,10 @@ export const VelocityBreakpointSchema = v.object({
 });
 export type VelocityBreakpointConfig = v.InferOutput<typeof VelocityBreakpointConfigSchema>;
 
+export type VelocityBreakpoint = v.InferOutput<typeof VelocityBreakpointSchema>;
+
 export const VelocityBreakpointConfigsSchema = v.array(VelocityBreakpointSchema);
-export type VelocityBreakpointConfigs = v.InferOutput<typeof VelocityBreakpointConfigsSchema>;
+export type VelocityBreakpoints = v.InferOutput<typeof VelocityBreakpointConfigsSchema>;
 
 export const defaultVelocityBreakpoints: VelocityBreakpointInput[] = [
     {
@@ -83,9 +85,7 @@ export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput
     });
 };
 
-export const buildVelocityBreakpointConfigs = (
-    breakpointInputs: VelocityBreakpointInput[] = defaultVelocityBreakpoints
-) => {
+export const buildVelocityBreakpoints = (breakpointInputs: VelocityBreakpointInput[] = defaultVelocityBreakpoints) => {
     const breakpoints = breakpointInputs.map(breakpointInput => buildVelocityBreakpoint(breakpointInput));
     return v.parse(VelocityBreakpointConfigsSchema, breakpoints);
 };

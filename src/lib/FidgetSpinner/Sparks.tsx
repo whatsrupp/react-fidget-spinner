@@ -26,7 +26,6 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         onRemove,
         frameRate,
         active,
-        intensity,
     } = buildSparkConfig(config);
 
     const [sparkMap, setSparkMap] = useState<Record<string, SparkProps>>({});
@@ -63,16 +62,14 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         if (elapsed > spawnInterval.current) {
             lastSpawnTime.current = time;
 
-            const intensityAdjustedRandom = Math.pow(Math.random(), intensity);
-            const newInterval =
-                minSpawnIntervalMs + intensityAdjustedRandom * (maxSpawnIntervalMs - minSpawnIntervalMs);
+            const newInterval = minSpawnIntervalMs + Math.random() * (maxSpawnIntervalMs - minSpawnIntervalMs);
             spawnInterval.current = newInterval;
 
             const id = Math.random().toString(36).substring(2, 15);
             const SparkComponent = components[Math.floor(Math.random() * components.length)];
             const angleRadians = Math.random() * 2 * Math.PI;
 
-            const distanceEnd = distanceStart + intensityAdjustedRandom * (maxDistancePx - minDistancePx);
+            const distanceEnd = distanceStart + Math.random() * (maxDistancePx - minDistancePx);
 
             const sparkProps: SparkProps = {
                 id,
@@ -119,7 +116,6 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         scaleEasing,
         distanceStart,
         minDistancePx,
-        intensity,
     ]);
 
     useAnimationFrame(spawnLoop, active);

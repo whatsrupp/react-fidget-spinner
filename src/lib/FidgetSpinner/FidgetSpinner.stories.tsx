@@ -6,26 +6,34 @@ import {buildResetConfig} from './ResetConfig';
 import {buildBubbleConfig} from './BubbleConfig';
 import {buildSparkConfig} from './SparkConfig';
 import {buildSpinnerConfig} from './SpinnerConfig';
-import {buildVelocityBreakpointConfigs} from './VelocityBreakpoints';
+import {buildVelocityBreakpoints} from './VelocityBreakpoints';
 
 const meta = {
     title: 'Spinner/FidgetSpinner',
     component: FidgetSpinner,
-    args: {
-        scaleConfig: buildScaleConfig({}),
-        resetConfig: buildResetConfig({}),
-        bubbleConfig: buildBubbleConfig({}),
-        sparkConfig: buildSparkConfig({}),
-        spinnerConfig: buildSpinnerConfig({}),
-        velocityBreakpoints: buildVelocityBreakpointConfigs(),
-    },
 } satisfies Meta<typeof FidgetSpinner>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const SillyGoose = () => {
+    return <div style={{userSelect: 'none', fontSize: '4rem'}}>🪿</div>;
+};
+
 export const Primary: Story = {
+    args: {
+        bubbleConfig: buildBubbleConfig(),
+        resetConfig: buildResetConfig(),
+        scaleConfig: buildScaleConfig(),
+        sparkConfig: buildSparkConfig(),
+        spinnerConfig: buildSpinnerConfig(),
+        velocityBreakpoints: buildVelocityBreakpoints(),
+    },
     render: args => {
-        return <FidgetSpinner {...args} />;
+        return (
+            <FidgetSpinner {...args}>
+                <SillyGoose />
+            </FidgetSpinner>
+        );
     },
 };
