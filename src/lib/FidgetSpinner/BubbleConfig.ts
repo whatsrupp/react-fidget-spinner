@@ -6,7 +6,7 @@ export type BubbleConfig = {
     /** Whether the bubble spawner is active or not - setting the component as active will stop the animation loop */
     active: boolean;
     /** The components to use for the bubbles - each bubble will be a random component from this array */
-    components: string[];
+    components: React.ReactNode[];
     /** The duration of the bubble animation */
     durationMs: number;
     /** The randomness in the duration of the bubble animation */

@@ -9,7 +9,7 @@ import {buildSpinnerConfig} from './SpinnerConfig';
 import {buildVelocityBreakpoints} from './VelocityBreakpoints';
 
 const meta = {
-    title: 'Spinner/FidgetSpinner',
+    title: 'Spinners/FidgetSpinner',
     component: FidgetSpinner,
 } satisfies Meta<typeof FidgetSpinner>;
 

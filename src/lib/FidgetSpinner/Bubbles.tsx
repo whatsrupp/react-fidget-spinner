@@ -7,6 +7,42 @@ import {toBezierEasing} from './toBezierEasing';
 import type {BubbleConfig} from './BubbleConfig';
 import {buildBubbleConfig} from './BubbleConfig';
 
+/**
+ * `Bubbles` is a standalone particle spawner component.
+ *
+ * The `Bubble` particles spawn at an origin point and then float upwards using a randomised cos/sin wave `wobble` function.
+ *
+ * Particles can be any valid `ReactNode` - we've used emojis by default.
+ *
+ * You can pass an array of your own `components` to render. The spawner will then pick one at random.
+ *
+ * We recommend that we recommend that you keep the components simple to render for performance
+ *
+ * ## Usage
+ *
+ * ```jsx
+ *
+ * import { Bubbles } from "react-fidget-spinner"
+ *
+ * const SimpleBubble = '🔥'
+ *
+ * const ComplexBubble = () => {
+ *    // Ok - it's not that complex, but you can use any react component
+ *   return (
+ *     <div>💸</div>
+ *   )
+ * }
+ *
+ * const MyBubbles = () => {
+ *
+ *   return (
+ *     <Bubbles components={['💸', SimpleBubble, <ComplexBubble /> ]} />
+ *   )
+ * }
+ *
+ * ```
+ *
+ */
 export const Bubbles = (config: Partial<BubbleConfig>) => {
     const {
         minSpawnIntervalMs,

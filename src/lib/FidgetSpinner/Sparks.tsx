@@ -6,6 +6,18 @@ import {toBezierEasing} from './toBezierEasing';
 import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 
+/**
+ * `Sparks` is a standalone particle spawner component
+ * 
+ * The `Spark` particles spawn within an origin area and then radiate outwards at a fixed angle from their start point.
+ * 
+ * Particles can be any valid `ReactNode` - we've used emojis by default.
+ * 
+ * You can pass an array of your own `components` to render. The spawner will then pick one at random.
+ * We recommend that we recommend that you keep the components simple to render for performance
+
+
+ */
 export const Sparks = (config: Partial<SparkConfig>) => {
     const {
         components,
