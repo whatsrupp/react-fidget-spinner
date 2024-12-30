@@ -5,6 +5,7 @@ import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
 import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
+import {createId} from './createId';
 
 /**
  * `Sparks` is a standalone particle spawner component
@@ -77,7 +78,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
             const newInterval = minSpawnIntervalMs + Math.random() * (maxSpawnIntervalMs - minSpawnIntervalMs);
             spawnInterval.current = newInterval;
 
-            const id = Math.random().toString(36).substring(2, 15);
+            const id = createId();
             const SparkComponent = components[Math.floor(Math.random() * components.length)];
             const angleRadians = Math.random() * 2 * Math.PI;
 

@@ -6,6 +6,7 @@ import {useAnimationFrame} from './useAnimationFrame';
 import {toBezierEasing} from './toBezierEasing';
 import type {BubbleConfig} from './BubbleConfig';
 import {buildBubbleConfig} from './BubbleConfig';
+import {createId} from './createId';
 
 /**
  * `Bubbles` is a standalone particle spawner component.
@@ -133,7 +134,7 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
             const yMax = -(yEnd + Math.random() * yRandomness);
             const yEasingFn = toBezierEasing(yEasing);
 
-            const id = Math.random().toString(36).substring(2, 15);
+            const id = createId();
             const Component = components[Math.floor(Math.random() * components.length)];
 
             const bubbleProps: BubbleProps = {
