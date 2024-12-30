@@ -20,18 +20,16 @@
   },
   "keywords": [
     "react",
-    "template",
-    "react-testing-library",
-    "testing-library",
-    "eslint",
-    "npm",
-    "rollup",
-    "stylelint",
-    "library",
-    "package",
-    "vite",
-    "css-modules",
-    "typescript"
+    "fidget-spinner",
+    "spinner",
+    "interactive-animations",
+    "clickable",
+    "clickable-animations",
+    "clickable-spinner",
+    "clickable-fidget-spinner",
+    "react-interactive-fun",
+    "react-confetti",
+    "just-for-fun"
   ],
   "description": "Turn any React component into an interactive clickable fidget spinner! 🪿",
   "scripts": {
