@@ -18,7 +18,21 @@ import classes from './Sparks.module.css';
  * You can pass an array of your own `components` to render. The spawner will then pick one at random.
  * We recommend that we recommend that you keep the components simple to render for performance
 
-
+ * ## Usage
+ *
+ * ```jsx
+ *
+ * import { Sparks } from "react-fidget-spinner"
+ *
+ *
+ * const MySparks = () => {
+ *
+ *   return (
+ *     <Sparks components={['💸', "Spark", <ComplexSpark /> ]} />
+ *   )
+ * }
+ *
+ * ```
  */
 export const Sparks = (config: Partial<SparkConfig>) => {
     const {
