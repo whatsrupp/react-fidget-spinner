@@ -17,6 +17,7 @@ import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 import type {VelocityBreakpoints} from './VelocityBreakpoints';
 import {buildVelocityBreakpoints} from './VelocityBreakpoints';
+import classes from './FidgetSpinner.module.css';
 
 type FidgetSpinnerProps = {
     /** Configuration that gets passed to the underlying `Bubbles` particle spawner component*/
@@ -321,30 +322,19 @@ export const FidgetSpinner = ({
     useAnimationFrame(animation);
 
     return (
-        <div
-            id={containerId}
-            style={{
-                position: 'relative',
-                cursor: 'pointer',
-                userSelect: 'none',
-            }}>
+        <div id={containerId} className={classes.fidgetSpinnerContainer}>
             <div
                 onClick={e => {
                     addEnergy();
                     triggerMouseClickAnimation(e);
                 }}
+                className={classes.spinnerContainer}
                 style={{
-                    position: 'absolute',
-                    left: '50%',
-                    top: '50%',
                     transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
-                    cursor: 'pointer',
-                    zIndex: 100,
-                    userSelect: 'none',
                 }}>
                 {children}
             </div>
-            <div style={{position: 'absolute', left: '50%', top: '50%'}}>
+            <div className={classes.particlesContainer}>
                 <Bubbles {...bubbleConfig} active={isActive} />
                 <Sparks {...sparkConfig} active={isActive} />
             </div>
@@ -359,26 +349,20 @@ const clickConfig = {
     onClickRemove: () => {},
 };
 function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>) {
-    const clickAnim = document.createElement('div');
-    clickAnim.style.position = 'absolute';
-    clickAnim.style.left = `${e.pageX}px`;
-    clickAnim.style.top = `${e.pageY}px`;
-    clickAnim.style.width = '40px';
-    clickAnim.style.height = '40px';
-    clickAnim.style.background = 'rgba(255,0,0,0.8)';
-    clickAnim.style.borderRadius = '50%';
-    clickAnim.style.transform = 'translate(-50%, -50%) scale(0)';
-    clickAnim.style.transition = 'all 300ms ease-out';
-    clickAnim.style.pointerEvents = 'none';
-    document.body.appendChild(clickAnim);
+    const explosion = document.createElement('div');
+    explosion.className = classes.mouseClick;
+    explosion.style.left = `${e.pageX}px`;
+    explosion.style.top = `${e.pageY}px`;
+
+    document.body.appendChild(explosion);
     clickConfig.onClickSpawn();
     requestAnimationFrame(() => {
-        clickAnim.style.transform = 'translate(-50%, -50%) scale(1)';
-        clickAnim.style.opacity = '0';
+        explosion.style.transform = 'translate(-50%, -50%) scale(1)';
+        explosion.style.opacity = '0';
     });
 
     setTimeout(() => {
-        clickAnim.remove();
+        explosion.remove();
         clickConfig.onClickRemove();
     }, clickConfig.durationMs);
 }

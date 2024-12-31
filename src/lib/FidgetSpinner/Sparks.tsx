@@ -6,6 +6,7 @@ import {toBezierEasing} from './toBezierEasing';
 import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 import {createId} from './createId';
+import classes from './Sparks.module.css';
 
 /**
  * `Sparks` is a standalone particle spawner component
@@ -134,7 +135,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
     useAnimationFrame(spawnLoop, active);
 
     return (
-        <div style={{position: 'relative'}}>
+        <div className={classes.sparks}>
             {sparks.map(sparkProps => (
                 <Spark key={sparkProps.id} {...sparkProps} />
             ))}
@@ -258,10 +259,8 @@ export const Spark = ({
 
     return (
         <div
+            className={classes.spark}
             style={{
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
                 opacity: sparkState.opacity,
                 transform: `translate(calc(${sparkState.x}px - 50%), calc(${sparkState.y}px - 50%)) scale(${sparkState.scale})`,
             }}>

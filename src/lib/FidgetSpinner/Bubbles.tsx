@@ -7,6 +7,7 @@ import {toBezierEasing} from './toBezierEasing';
 import type {BubbleConfig} from './BubbleConfig';
 import {buildBubbleConfig} from './BubbleConfig';
 import {createId} from './createId';
+import classes from './Bubbles.module.css';
 
 /**
  * `Bubbles` is a standalone particle spawner component.
@@ -25,19 +26,11 @@ import {createId} from './createId';
  *
  * import { Bubbles } from "react-fidget-spinner"
  *
- * const SimpleBubble = '🔥'
- *
- * const ComplexBubble = () => {
- *    // Ok - it's not that complex, but you can use any react component
- *   return (
- *     <div>💸</div>
- *   )
- * }
  *
  * const MyBubbles = () => {
  *
  *   return (
- *     <Bubbles components={['💸', SimpleBubble, <ComplexBubble /> ]} />
+ *     <Bubbles components={['💸', "Bubble", <ComplexBubble /> ]} />
  *   )
  * }
  *
@@ -195,7 +188,7 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
     useAnimationFrame(spawnLoop, active);
 
     return (
-        <div style={{position: 'relative'}}>
+        <div className={classes.bubbles}>
             {bubbles.map(bubbleProps => (
                 <Bubble key={bubbleProps.id} {...bubbleProps} />
             ))}
@@ -316,10 +309,8 @@ export const Bubble = ({
 
     return (
         <div
+            className={classes.bubble}
             style={{
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
                 scale: bubbleState.scale,
                 opacity: bubbleState.opacity.toString(),
                 transform: `translate(calc(${bubbleState.x}px - 50%), calc(${bubbleState.y}px - 50%)) scale(${bubbleState.scale})`,

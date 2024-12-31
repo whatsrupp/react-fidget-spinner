@@ -1,0 +1,11 @@
+.sparks {
+    position: relative;
+}
+
+.spark {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    user-select: none;
+}
