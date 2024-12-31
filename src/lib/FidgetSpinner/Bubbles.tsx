@@ -47,11 +47,11 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
         opacityEasing,
         opacityStart,
         opacityEnd,
-        startScale,
-        startScaleRandomness,
+        scaleStart,
+        scaleStartRandomness,
         scaleEasing,
-        endScale,
-        endScaleRandomness,
+        scaleEnd,
+        scaleEndRandomness,
         wobbleFrequency,
         wobbleFrequencyRandomness,
         wobbleAmplitude,
@@ -117,15 +117,9 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
                 return wobbleX;
             };
 
-            const xStart = Math.random() * xOffsetRandomness;
-
             const duration = durationMs + Math.random() * durationMsRandomness;
-            const scaleStart = startScale + Math.random() * startScaleRandomness;
-            const scaleEnd = endScale + Math.random() * endScaleRandomness;
-            const scaleEasingFn = toBezierEasing(scaleEasing);
-            const opacityEasingFn = toBezierEasing(opacityEasing);
+
             const yMax = -(yEnd + Math.random() * yRandomness);
-            const yEasingFn = toBezierEasing(yEasing);
 
             const id = createId();
             const Component = components[Math.floor(Math.random() * components.length)];
@@ -133,16 +127,16 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
             const bubbleProps: BubbleProps = {
                 id,
                 durationMs: duration,
-                scaleStart,
-                scaleEnd,
-                scaleEasing: scaleEasingFn,
+                scaleStart: scaleStart + Math.random() * scaleStartRandomness,
+                scaleEnd: scaleEnd + Math.random() * scaleEndRandomness,
+                scaleEasing: toBezierEasing(scaleEasing),
                 opacityStart,
                 opacityEnd,
-                opacityEasing: opacityEasingFn,
+                opacityEasing: toBezierEasing(opacityEasing),
                 yStart,
                 yEnd: yMax,
-                yEasing: yEasingFn,
-                xStart,
+                yEasing: toBezierEasing(yEasing),
+                xStart: Math.random() * xOffsetRandomness,
                 xWobbleFunction,
                 cleanup: () => {
                     removeBubble(id);
@@ -165,10 +159,10 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
         xOffsetRandomness,
         durationMs,
         durationMsRandomness,
-        startScale,
-        startScaleRandomness,
-        endScale,
-        endScaleRandomness,
+        scaleStart,
+        scaleStartRandomness,
+        scaleEnd,
+        scaleEndRandomness,
         scaleEasing,
         opacityEasing,
         opacityStart,

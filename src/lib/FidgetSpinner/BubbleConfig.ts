@@ -12,9 +12,9 @@ export type BubbleConfig = {
     /** The randomness in the duration of the bubble animation */
     durationMsRandomness: number;
     /** The ending scale of the bubble */
-    endScale: number;
+    scaleEnd: number;
     /** The randomness in the ending scale of the bubble */
-    endScaleRandomness: number;
+    scaleEndRandomness: number;
     /** The frame rate of the animation */
     frameRate: number;
     /** The maximum time between spawning bubbles */
@@ -34,9 +34,9 @@ export type BubbleConfig = {
     /** The bezier curve definition which controls the scale of the bubble over time */
     scaleEasing: [number, number, number, number];
     /** The starting scale of the bubble */
-    startScale: number;
+    scaleStart: number;
     /** The randomness in the starting scale of the bubble */
-    startScaleRandomness: number;
+    scaleStartRandomness: number;
     /** The amplitude of the wobble animation */
     wobbleAmplitude: number;
     /** The randomness in the amplitude of the wobble animation */
@@ -62,8 +62,8 @@ export const BubbleConfigSchema = v.object({
     components: v.array(v.string()),
     durationMs: v.pipe(v.number(), v.toMinValue(0)),
     durationMsRandomness: v.pipe(v.number(), v.toMinValue(0)),
-    endScale: v.pipe(v.number(), v.toMinValue(0)),
-    endScaleRandomness: v.pipe(v.number(), v.toMinValue(0)),
+    scaleEnd: v.pipe(v.number(), v.toMinValue(0)),
+    scaleEndRandomness: v.pipe(v.number(), v.toMinValue(0)),
     frameRate: v.pipe(v.number(), v.toMinValue(0)),
     maxSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
     minSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
@@ -73,8 +73,8 @@ export const BubbleConfigSchema = v.object({
     opacityEnd: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(1)),
     opacityStart: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(1)),
     scaleEasing: EasingSchema,
-    startScale: v.pipe(v.number(), v.toMinValue(0)),
-    startScaleRandomness: v.pipe(v.number(), v.toMinValue(0)),
+    scaleStart: v.pipe(v.number(), v.toMinValue(0)),
+    scaleStartRandomness: v.pipe(v.number(), v.toMinValue(0)),
     wobbleAmplitude: v.pipe(v.number(), v.toMinValue(0)),
     wobbleAmplitudeRandomness: v.pipe(v.number(), v.toMinValue(0)),
     wobbleFrequency: v.pipe(v.number(), v.toMinValue(0)),
@@ -91,8 +91,8 @@ export const defaultBubbleConfig: BubbleConfig = {
     components: ['💸', '🔥'],
     durationMs: 1500,
     durationMsRandomness: 1000,
-    endScale: 2,
-    endScaleRandomness: 0.2,
+    scaleEnd: 2,
+    scaleEndRandomness: 0.2,
     frameRate: 60,
     maxSpawnIntervalMs: 1000,
     minSpawnIntervalMs: 200,
@@ -102,8 +102,8 @@ export const defaultBubbleConfig: BubbleConfig = {
     opacityEnd: 0,
     opacityStart: 1,
     scaleEasing: [0.25, -0.75, 0.8, 1.2],
-    startScale: 1,
-    startScaleRandomness: 0.5,
+    scaleStart: 1,
+    scaleStartRandomness: 0.5,
     wobbleAmplitude: 1,
     wobbleAmplitudeRandomness: 40,
     wobbleFrequency: 0.1,
