@@ -7,6 +7,7 @@ import {buildBubbleConfig} from './BubbleConfig';
 import {buildSparkConfig} from './SparkConfig';
 import {buildSpinnerConfig} from './SpinnerConfig';
 import {buildVelocityBreakpoints} from './VelocityBreakpoints';
+import {SillyGoose} from './SillyGoose';
 
 const meta = {
     title: 'Spinners/FidgetSpinner',
@@ -15,10 +16,6 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-const SillyGoose = () => {
-    return <div style={{userSelect: 'none', fontSize: '4rem'}}>🪿</div>;
-};
 
 export const Primary: Story = {
     args: {
