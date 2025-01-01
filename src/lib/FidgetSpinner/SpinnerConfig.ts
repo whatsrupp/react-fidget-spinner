@@ -12,7 +12,7 @@ export const SpinnerConfig = v.object({
     maxAngularVelocity: v.pipe(v.number(), v.toMinValue(0)),
     onMaxAngularVelocity: v.function(),
     onClick: v.function(),
-    direction: v.union([v.literal('clockwise'), v.literal('counterclockwise')]),
+    direction: v.union([v.literal('clockwise'), v.literal('antiClockwise')]),
 });
 
 export type SpinnerConfig = Omit<v.InferOutput<typeof SpinnerConfig>, keyof SpinnerConfigCallbacks> &

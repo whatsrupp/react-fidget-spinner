@@ -329,6 +329,8 @@ export const FidgetSpinner = ({
 
     useAnimationFrame(animation);
 
+    const directionAdjustedAngle = spinnerConfig.direction === 'clockwise' ? angleRadians : -angleRadians;
+
     return (
         <div id={containerId} className={classes.fidgetSpinnerContainer}>
             <div
@@ -338,7 +340,7 @@ export const FidgetSpinner = ({
                 }}
                 className={classes.spinnerContainer}
                 style={{
-                    transform: `translate(-50%, -50%) rotate(${angleRadians}rad) scale(${scale})`,
+                    transform: `translate(-50%, -50%) rotate(${directionAdjustedAngle}rad) scale(${scale})`,
                 }}>
                 {children}
             </div>
