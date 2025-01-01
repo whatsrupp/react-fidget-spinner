@@ -32,41 +32,32 @@ export const defaultVelocityBreakpoints: VelocityBreakpointInput[] = [
         breakpoint: 0.9,
         config: {
             scaleConfig: {scale: 3},
-            bubbleConfig: {},
-            sparkConfig: {},
-            resetConfig: {},
         },
     },
     {
         breakpoint: 0.7,
         config: {
             scaleConfig: {scale: 2},
-            bubbleConfig: {},
-            sparkConfig: {},
-            resetConfig: {},
         },
     },
     {
         breakpoint: 0.3,
         config: {
             scaleConfig: {scale: 1.5},
-            bubbleConfig: {},
-            sparkConfig: {},
-            resetConfig: {},
         },
     },
 ];
 
 type VelocityBreakpointConfigInput = {
-    scaleConfig: Partial<ScaleConfig>;
-    bubbleConfig: Partial<BubbleConfig>;
-    sparkConfig: Partial<SparkConfig>;
-    resetConfig: Partial<ResetConfig>;
+    scaleConfig?: Partial<ScaleConfig>;
+    bubbleConfig?: Partial<BubbleConfig>;
+    sparkConfig?: Partial<SparkConfig>;
+    resetConfig?: Partial<ResetConfig>;
 };
 
 type VelocityBreakpointInput = {
     breakpoint: number;
-    config: Partial<VelocityBreakpointConfigInput>;
+    config: VelocityBreakpointConfigInput;
 };
 
 export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput) => {
@@ -85,7 +76,33 @@ export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput
     });
 };
 
-export const buildVelocityBreakpoints = (breakpointInputs: VelocityBreakpointInput[] = defaultVelocityBreakpoints) => {
-    const breakpoints = breakpointInputs.map(breakpointInput => buildVelocityBreakpoint(breakpointInput));
+export const buildVelocityBreakpoints = (
+    breakpointInputs: VelocityBreakpointInput[] = defaultVelocityBreakpoints,
+    baseConfig: VelocityBreakpointConfigInput
+) => {
+    const breakpoints = breakpointInputs.map(breakpointInput => {
+        const breakpointInputConfig = breakpointInput.config;
+
+        const mergedConfig = {
+            scaleConfig: {
+                ...baseConfig.scaleConfig,
+                ...breakpointInputConfig.scaleConfig,
+            },
+            bubbleConfig: {
+                ...baseConfig.bubbleConfig,
+                ...breakpointInputConfig.bubbleConfig,
+            },
+            sparkConfig: {
+                ...baseConfig.sparkConfig,
+                ...breakpointInputConfig.sparkConfig,
+            },
+            resetConfig: {
+                ...baseConfig.resetConfig,
+                ...breakpointInputConfig.resetConfig,
+            },
+        };
+
+        return buildVelocityBreakpoint({...breakpointInput, config: mergedConfig});
+    });
     return v.parse(VelocityBreakpointConfigsSchema, breakpoints);
 };
