@@ -5,8 +5,16 @@ const preview: Preview = {
     parameters: {
         layout: 'centered',
         backgrounds: {
-            default: 'light',
-            values: [{name: 'light', value: '#F3D173'}],
+            default: 'yellow',
+            values: [
+                {name: 'yellow', value: '#F3D173'},
+                {name: 'gray', value: '#CBCBCB'},
+                {name: 'blue', value: '#7395f3'},
+                {name: 'red', value: '#f39173'},
+                {name: 'lime', value: '#d5f373'},
+                {name: 'purple', value: '#d173f3'},
+                {name: 'teal', value: '#73f3d1'},
+            ],
         },
         controls: {
             matchers: {
