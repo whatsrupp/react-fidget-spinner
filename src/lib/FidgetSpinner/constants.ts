@@ -77,3 +77,23 @@ export const genZExpressions = [
 export const expressions = [...positiveEmojis, ...genZExpressions];
 
 export const scores = ['+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '+10'];
+
+export const positiveItalianExpressions = [
+    'bene',
+    'molto bene',
+    'ottimo',
+    'fantastico',
+    'eccellente',
+    'bellissimo',
+    'perfetto',
+    'magnifico',
+    'stupendo',
+    'meraviglioso',
+    'splendido',
+    'incredibile',
+    'favoloso',
+    'straordinario',
+    'eccezionale',
+];
+
+export const ItalianEmojis = ['🍋', '🛵', '🍕', '🍇', '🌴', '🏛️', '🍝', '🍷', '🌊', '🧀', '🫒', '🍊'];

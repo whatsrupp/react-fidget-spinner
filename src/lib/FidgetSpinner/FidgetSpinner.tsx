@@ -84,19 +84,27 @@ export const FidgetSpinner = ({
     spinnerConfig: spinnerConfigOverrides,
     velocityBreakpoints: velocityBreakpointsOverrides,
 }: PropsWithChildren<FidgetSpinnerProps>) => {
-    const spinnerConfig = buildSpinnerConfig(spinnerConfigOverrides);
     const defaultScaleConfig = buildScaleConfig(scaleConfigOverrides);
     const defaultResetConfig = buildResetConfig(resetConfigOverrides);
     const defaultBubbleConfig = buildBubbleConfig(bubbleConfigOverrides);
     const defaultSparkConfig = buildSparkConfig(sparkConfigOverrides);
+    const defaultSpinnerConfig = buildSpinnerConfig(spinnerConfigOverrides);
 
-    const velocityBreakpoints: VelocityBreakpoints = buildVelocityBreakpoints(velocityBreakpointsOverrides);
+    const baseConfig = {
+        scaleConfig: defaultScaleConfig,
+        resetConfig: defaultResetConfig,
+        bubbleConfig: defaultBubbleConfig,
+        sparkConfig: defaultSparkConfig,
+        spinnerConfig: defaultSpinnerConfig,
+    };
+
+    const velocityBreakpoints: VelocityBreakpoints = buildVelocityBreakpoints(velocityBreakpointsOverrides, baseConfig);
 
     const [scaleConfig, setScaleConfig] = useState(defaultScaleConfig);
     const [resetConfig, setResetConfig] = useState(defaultResetConfig);
     const [bubbleConfig, setBubbleConfig] = useState(defaultBubbleConfig);
     const [sparkConfig, setSparkConfig] = useState(defaultSparkConfig);
-
+    const [spinnerConfig] = useState(defaultSpinnerConfig);
     const [angleRadians, setAngleRadians] = useState(spinnerConfig.initialAngle);
     const angleRadiansRef = useRef(spinnerConfig.initialAngle);
     const angularVelocityRef = useRef(spinnerConfig.initialAngularVelocity);
