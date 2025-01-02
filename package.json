@@ -29,7 +29,9 @@
     "clickable-fidget-spinner",
     "react-interactive-fun",
     "react-confetti",
-    "just-for-fun"
+    "just-for-fun",
+    "front-end",
+    "react-fidget-spinner"
   ],
   "description": "Turn any React component into an interactive clickable fidget spinner! 🪿",
   "scripts": {
