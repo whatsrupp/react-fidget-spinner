@@ -27,4 +27,5 @@
     transform: translate(-50%, -50%) scale(0);
     transition: all 300ms ease-out;
     width: 40px;
+    z-index: 200;
 }

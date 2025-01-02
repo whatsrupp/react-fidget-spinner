@@ -15,7 +15,7 @@ import type {BubbleConfig} from './BubbleConfig';
 import {buildBubbleConfig} from './BubbleConfig';
 import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
-import type {VelocityBreakpoints} from './VelocityBreakpoints';
+import type {VelocityBreakpointsInput, VelocityBreakpoints} from './VelocityBreakpoints';
 import {buildVelocityBreakpoints} from './VelocityBreakpoints';
 import classes from './FidgetSpinner.module.css';
 
@@ -33,7 +33,7 @@ type FidgetSpinnerProps = {
     /** Configuration for the flywheel physics of the `FidgetSpinner` */
     spinnerConfig?: Partial<SpinnerConfig>;
     /** An array of configuration changes that trigger when the velocity of the fidget spinner gets to `x%` of its `maxAngularVelocity` */
-    velocityBreakpoints?: VelocityBreakpoints;
+    velocityBreakpoints?: VelocityBreakpointsInput;
 };
 
 /**

@@ -55,10 +55,12 @@ type VelocityBreakpointConfigInput = {
     resetConfig?: Partial<ResetConfig>;
 };
 
-type VelocityBreakpointInput = {
+export type VelocityBreakpointInput = {
     breakpoint: number;
     config: VelocityBreakpointConfigInput;
 };
+
+export type VelocityBreakpointsInput = VelocityBreakpointInput[];
 
 export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput) => {
     const {breakpoint, config} = breakpointInput;
