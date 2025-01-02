@@ -28,6 +28,16 @@ const baseConfig = {
 };
 
 export const Primary: Story = {
+    render: args => {
+        return (
+            <FidgetSpinner {...args}>
+                <SillyGoose />
+            </FidgetSpinner>
+        );
+    },
+};
+
+export const FullConfiguration: Story = {
     args: {
         ...baseConfig,
         velocityBreakpoints: buildVelocityBreakpoints(undefined, baseConfig),

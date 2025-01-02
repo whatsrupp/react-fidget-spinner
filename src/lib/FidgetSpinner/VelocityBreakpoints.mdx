@@ -1,0 +1,51 @@
+import { Meta, ArgTypes, Story, Canvas, Source, Markdown, Primary } from "@storybook/blocks";
+import FidgetSpinnerStories from "./FidgetSpinner.stories.tsx";
+import { buildVelocityBreakpoints } from "./VelocityBreakpoints.ts";
+
+<Meta title="Concepts/Velocity\ Breakpoints" of={FidgetSpinnerStories} />
+
+# Velocity Breakpoints
+
+Velocity breakpoints let you change the configuration of the spinner based on the the velocity of the spinner.
+
+Config defined in a velocity breakpoint will be merged with the base config of the spinner.
+
+For example, in the default settings we make the spinner grow at 3 different velocities.
+
+
+
+```tsx
+
+export const defaultVelocityBreakpoints: VelocityBreakpointInput[] = [
+    {
+        breakpoint: 0.9, // Triggers at 90% of the max velocity
+        config: {
+            scaleConfig: {scale: 3},
+        },
+    },
+    {
+        breakpoint: 0.7, // Triggers at 70% 
+        config: {
+            scaleConfig: {scale: 2},
+        },
+    },
+    {
+        breakpoint: 0.3,
+        config: {
+            scaleConfig: {scale: 1.5}, // Triggers at 30% of the max velocity
+        },
+    },
+];
+
+```
+
+<Primary />
+
+
+
+
+
+
+
+
+
