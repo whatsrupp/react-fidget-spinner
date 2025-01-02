@@ -3,6 +3,7 @@ import type {Preview} from '@storybook/react';
 const preview: Preview = {
     tags: ['autodocs'],
     parameters: {
+        deepControls: {enabled: true},
         layout: 'centered',
         backgrounds: {
             default: 'yellow',

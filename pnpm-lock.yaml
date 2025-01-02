@@ -159,6 +159,9 @@ importers:
       storybook:
         specifier: ^8.4.7
         version: 8.4.7(prettier@3.3.3)
+      storybook-addon-deep-controls:
+        specifier: ^0.9.2
+        version: 0.9.2(@storybook/addon-controls@8.4.7(storybook@8.4.7(prettier@3.3.3)))(@storybook/types@8.4.7(storybook@8.4.7(prettier@3.3.3)))(storybook@8.4.7(prettier@3.3.3))
       stylelint:
         specifier: 16.10.0
         version: 16.10.0(typescript@5.6.3)
@@ -4815,6 +4818,13 @@ packages:
   stack-utils@2.0.6:
     resolution: {integrity: sha512-XlkWvfIm6RmsWtNJx+uqtKLS8eqFbxUg0ZzLXqY0caEy9l7hruX8IpiDnjsLavoBgqCCR71TqWO8MaXYheJ3RQ==}
     engines: {node: '>=10'}
+
+  storybook-addon-deep-controls@0.9.2:
+    resolution: {integrity: sha512-6XE4XJTZ3PevX3gIJUm5cNyF0cpnXTPabpsIXCDHYzm6pQ0p57AFI6l0lTAcL/q+bFR4Qjihq49LmO46qgG1iA==}
+    peerDependencies:
+      '@storybook/addon-controls': 7.x.x || 8.x.x
+      '@storybook/types': 7.x.x || 8.x.x
+      storybook: 7.x.x || 8.x.x
 
   storybook@8.4.7:
     resolution: {integrity: sha512-RP/nMJxiWyFc8EVMH5gp20ID032Wvk+Yr3lmKidoegto5Iy+2dVQnUoElZb2zpbVXNHWakGuAkfI0dY1Hfp/vw==}
@@ -10948,6 +10958,12 @@ snapshots:
   stack-utils@2.0.6:
     dependencies:
       escape-string-regexp: 2.0.0
+
+  storybook-addon-deep-controls@0.9.2(@storybook/addon-controls@8.4.7(storybook@8.4.7(prettier@3.3.3)))(@storybook/types@8.4.7(storybook@8.4.7(prettier@3.3.3)))(storybook@8.4.7(prettier@3.3.3)):
+    dependencies:
+      '@storybook/addon-controls': 8.4.7(storybook@8.4.7(prettier@3.3.3))
+      '@storybook/types': 8.4.7(storybook@8.4.7(prettier@3.3.3))
+      storybook: 8.4.7(prettier@3.3.3)
 
   storybook@8.4.7(prettier@3.3.3):
     dependencies:
