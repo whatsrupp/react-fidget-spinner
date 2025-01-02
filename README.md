@@ -2,12 +2,14 @@
 
 [![CI](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/merge-jobs.yml/badge.svg)](https://github.com/morewings/react-library-template/actions/workflows/merge-jobs.yml)
 [![Storybook deploy](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/pages.yml/badge.svg)](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/pages.yml)
+[![Storybook](https://cdn.jsdelivr.net/gh/storybookjs/brand@main/badge/badge-storybook.svg)](https://whatsrupp.github.io/react-fidget-spinner)
 
 Turn any react component into a fun clickable fidget spinner.
 
-[![a silly goose](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXFtdWc1eDVxcGd6dzMzbTI2ejV5bm1nbXZqa2w2cDRlM3VnZDZzeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/p00fPNBjCUAKqogAyr/giphy.gif)](#)
+[![a silly goose](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXFtdWc1eDVxcGd6dzMzbTI2ejV5bm1nbXZqa2w2cDRlM3VnZDZzeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/p00fPNBjCUAKqogAyr/giphy.gif)](https://whatsrupp.github.io/react-fidget-spinner)
 
 *not just this goose* 🪿
+
 
 ## Quickstart
 
@@ -30,7 +32,7 @@ const MyFidgetSpinner = () => {
 
 ## Where are the full docs?
 
-Full docs and, more importantly(!), *interactive and clickable* examples on [Storybook](https://whatsrupp.github.io/react-fidget-spinner).
+Interactive examples and full documentation can be found on [Storybook](https://whatsrupp.github.io/react-fidget-spinner).
 
 ## Features
 
@@ -49,7 +51,7 @@ Adding fun easter eggs into projects is often overlooked - It's often hard to ju
 
 But Users often _love_, remember and share these little interactions. There's always a bit of joy in finding something hidden.
 
-I thought it could be a nice to spend a bit of time building something light and interactive that other people could use to quickly sprinkle a bit of fun around their existing comopnents. So, here it is... A silly component that turns whatever you want into a clickable spinning interactive widget.
+I thought it could be a nice to spend a bit of time over the holiday season building something light and interactive that other people could use to quickly sprinkle a bit of fun around their existing comopnents. So, here it is... A silly component that turns whatever you want into a clickable spinning interactive widget.
 
 I also took this as a nice opportunity to publish my first public npm package and learn a bit more about storybook (which I really enjoyed, especially given how the entire value of the component comes from interacting with the spinner live)
 
