@@ -2,8 +2,8 @@
 
 [![CI](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/merge-jobs.yml/badge.svg)](https://github.com/morewings/react-library-template/actions/workflows/merge-jobs.yml)
 [![Storybook deploy](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/pages.yml/badge.svg)](https://github.com/whatsrupp/react-fidget-spinner/actions/workflows/pages.yml)
-[![Storybook](https://cdn.jsdelivr.net/gh/storybookjs/brand@main/badge/badge-storybook.svg)](https://whatsrupp.github.io/react-fidget-spinner)
-
+[![Storybook](https://cdn.jsdelivr.net/gh/storybookjs/brand@main/badge/badge-storybook.svg)](https://whatsrupp.github.io/react-fidget-spinner/?path=/docs/spinners-fidgetspinner--welcome)
+[![npm version](https://img.shields.io/npm/v/react-fidget-spinner.svg)](https://www.npmjs.com/package/react-fidget-spinner)
 Turn any react component into a fun clickable fidget spinner.
 
 [![a silly goose](https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExMXFtdWc1eDVxcGd6dzMzbTI2ejV5bm1nbXZqa2w2cDRlM3VnZDZzeSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/p00fPNBjCUAKqogAyr/giphy.gif)](https://whatsrupp.github.io/react-fidget-spinner)
@@ -32,7 +32,7 @@ const MyFidgetSpinner = () => {
 
 ## Where are the full docs?
 
-Interactive examples and full documentation can be found on [Storybook](https://whatsrupp.github.io/react-fidget-spinner).
+Interactive examples and full documentation can be found on [Storybook](https://whatsrupp.github.io/react-fidget-spinner/?path=/docs/spinners-fidgetspinner--welcome).
 
 ## Features
 
