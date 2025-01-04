@@ -17,12 +17,12 @@ export type VariationConfig = {
     value: number;
 };
 
-type NumericalControlWithVariation = {
+type NumericControlWithVariation = {
     value: number;
     variation?: VariationConfig;
 };
 
-export const NumericalVariationSchema = v.object({
+export const NumericVariationSchema = v.object({
     type: v.union([v.literal(VariationType.Plus), v.literal(VariationType.Minus), v.literal(VariationType.PlusMinus)]),
     unit: v.union([v.literal(VariationUnit.Percent), v.literal(VariationUnit.Absolute)]),
     value: v.number(),
@@ -30,29 +30,29 @@ export const NumericalVariationSchema = v.object({
 
 export const NumberWithVariationSchema = v.object({
     value: v.number(),
-    variation: v.optional(NumericalVariationSchema),
+    variation: v.optional(NumericVariationSchema),
 });
 
-export const NumericalControlSchema = v.union([
+export const NumericControlSchema = v.union([
     v.number(),
     v.object({
         value: v.number(),
-        variation: v.optional(NumericalVariationSchema),
+        variation: v.optional(NumericVariationSchema),
     }),
 ]);
 
-export type NumericalControl = NumericalControlWithVariation | number;
+export type NumericControl = NumericControlWithVariation | number;
 
-export const toNumber = (numericalControl: NumericalControl) => {
-    if (typeof numericalControl === 'number') {
-        return numericalControl;
+export const toNumber = (numericControl: NumericControl) => {
+    if (typeof numericControl === 'number') {
+        return numericControl;
     }
 
-    if (!numericalControl.variation) {
-        return numericalControl.value;
+    if (!numericControl.variation) {
+        return numericControl.value;
     }
 
-    const {variation, value: baseValue} = numericalControl;
+    const {variation, value: baseValue} = numericControl;
 
     const centredRandom = Math.random() * 2 - 1;
 

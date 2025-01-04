@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 
-import type {NumericalControl} from './NumericControl';
-import {NumericalControlSchema, VariationType, VariationUnit} from './NumericControl';
+import type {NumericControl} from './NumericControl';
+import {NumericControlSchema, VariationType, VariationUnit} from './NumericControl';
 
 export type SparkConfig = {
     /** Whether the spark spawner is active or not - setting the component as active will stop the animation loop */
@@ -11,15 +11,15 @@ export type SparkConfig = {
     /** The bezier curve definition which controls the distance of the spark over time */
     distanceEasing: [number, number, number, number];
     /** The starting distance of the spark */
-    distanceStart: NumericalControl;
+    distanceStart: NumericControl;
     /** The ending distance of the spark */
-    distanceEnd: NumericalControl;
+    distanceEnd: NumericControl;
     /** The duration of the spark animation */
-    durationMs: NumericalControl;
+    durationMs: NumericControl;
     /** The frame rate of the animation */
-    frameRate: NumericalControl;
+    frameRate: NumericControl;
     /** The intensity of the spark */
-    intensity: NumericalControl;
+    intensity: NumericControl;
     /** The callback function that is called when a spark is removed */
     onRemove: () => void;
     /** The callback function that is called when a spark is spawned */
@@ -27,37 +27,37 @@ export type SparkConfig = {
     /** The bezier curve definition which controls the opacity of the spark over time */
     opacityEasing: [number, number, number, number];
     /** The ending opacity of the spark */
-    opacityEnd: NumericalControl;
+    opacityEnd: NumericControl;
     /** The starting opacity of the spark */
-    opacityStart: NumericalControl;
+    opacityStart: NumericControl;
     /** The bezier curve definition which controls the scale of the spark over time */
     scaleEasing: [number, number, number, number];
     /** The ending scale of the spark */
-    scaleEnd: NumericalControl;
+    scaleEnd: NumericControl;
     /** The starting scale of the spark */
-    scaleStart: NumericalControl;
+    scaleStart: NumericControl;
     /** The interval between spawning sparks */
-    spawnIntervalMs: NumericalControl;
+    spawnIntervalMs: NumericControl;
 };
 
 export const SparkConfigSchema = v.object({
     active: v.boolean(),
     components: v.array(v.any()),
     distanceEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
-    distanceStart: NumericalControlSchema,
-    distanceEnd: NumericalControlSchema,
-    durationMs: NumericalControlSchema,
-    frameRate: NumericalControlSchema,
-    intensity: NumericalControlSchema,
+    distanceStart: NumericControlSchema,
+    distanceEnd: NumericControlSchema,
+    durationMs: NumericControlSchema,
+    frameRate: NumericControlSchema,
+    intensity: NumericControlSchema,
     onRemove: v.function(),
     onSpawn: v.function(),
     opacityEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
-    opacityEnd: NumericalControlSchema,
-    opacityStart: NumericalControlSchema,
+    opacityEnd: NumericControlSchema,
+    opacityStart: NumericControlSchema,
     scaleEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
-    scaleEnd: NumericalControlSchema,
-    scaleStart: NumericalControlSchema,
-    spawnIntervalMs: NumericalControlSchema,
+    scaleEnd: NumericControlSchema,
+    scaleStart: NumericControlSchema,
+    spawnIntervalMs: NumericControlSchema,
 });
 
 export const defaultSparkConfig: SparkConfig = {
