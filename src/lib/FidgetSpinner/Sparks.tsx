@@ -55,8 +55,6 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         spawnIntervalMs,
     } = buildSparkConfig(config);
 
-    console.log(config);
-
     const [sparkMap, setSparkMap] = useState<Record<string, SparkProps>>({});
 
     const sparks = useMemo(() => {
