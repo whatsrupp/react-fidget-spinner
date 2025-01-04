@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 
-import type {NumericalControl} from './NumericalControl';
-import {NumericalControlSchema, VariationType, VariationUnit} from './NumericalControl';
+import type {NumericalControl} from './NumericControl';
+import {NumericalControlSchema, VariationType, VariationUnit} from './NumericControl';
 
 export type SparkConfig = {
     /** Whether the spark spawner is active or not - setting the component as active will stop the animation loop */

@@ -7,7 +7,7 @@ import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 import {createId} from './createId';
 import classes from './Sparks.module.css';
-import {toNumber} from './NumericalControl';
+import {toNumber} from './NumericControl';
 
 /**
  * `Sparks` is a standalone particle spawner component
