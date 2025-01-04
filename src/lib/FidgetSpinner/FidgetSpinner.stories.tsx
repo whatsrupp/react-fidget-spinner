@@ -52,7 +52,7 @@ export const FullConfiguration: Story = {
             scaleEnd: 2,
             scaleStart: 0.2,
             durationMs: 2000,
-            maxDistancePx: 500,
+            distanceEnd: 500,
         },
         velocityBreakpoints: [],
     },
