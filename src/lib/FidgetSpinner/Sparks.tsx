@@ -40,8 +40,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         components,
         durationMs,
         distanceStart,
-        maxDistancePx,
-        minDistancePx,
+        distanceEnd,
         distanceEasing,
         opacityEasing,
         opacityStart,
@@ -55,6 +54,8 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         active,
         spawnIntervalMs,
     } = buildSparkConfig(config);
+
+    console.log(config);
 
     const [sparkMap, setSparkMap] = useState<Record<string, SparkProps>>({});
 
@@ -96,17 +97,15 @@ export const Sparks = (config: Partial<SparkConfig>) => {
             const SparkComponent = components[Math.floor(Math.random() * components.length)];
             const angleRadians = Math.random() * 2 * Math.PI;
 
-            const distanceEnd = distanceStart + Math.random() * (maxDistancePx - minDistancePx);
-
             const sparkProps: SparkProps = {
                 id,
-                durationMs,
-                frameRate,
-                opacityStart,
-                opacityEnd,
+                durationMs: toNumber(durationMs),
+                frameRate: toNumber(frameRate),
+                opacityStart: toNumber(opacityStart),
+                opacityEnd: toNumber(opacityEnd),
                 opacityEasing,
-                distanceStart,
-                distanceEnd,
+                distanceStart: toNumber(distanceStart),
+                distanceEnd: toNumber(distanceEnd),
                 distanceEasing,
                 onSpawn,
                 onRemove,
@@ -114,8 +113,8 @@ export const Sparks = (config: Partial<SparkConfig>) => {
                     removeSpark(id);
                 },
                 angleRadians,
-                scaleStart,
-                scaleEnd,
+                scaleStart: toNumber(scaleStart),
+                scaleEnd: toNumber(scaleEnd),
                 scaleEasing,
                 Component: SparkComponent,
             };
@@ -132,7 +131,6 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         opacityStart,
         opacityEnd,
         opacityEasing,
-        maxDistancePx,
         distanceEasing,
         onSpawn,
         onRemove,
@@ -140,8 +138,8 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         scaleEnd,
         scaleEasing,
         distanceStart,
-        minDistancePx,
         spawnIntervalMs,
+        distanceEnd,
     ]);
 
     useAnimationFrame(spawnLoop, active);

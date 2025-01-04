@@ -11,21 +11,15 @@ export type SparkConfig = {
     /** The bezier curve definition which controls the distance of the spark over time */
     distanceEasing: [number, number, number, number];
     /** The starting distance of the spark */
-    distanceStart: number;
+    distanceStart: NumericalControl;
+    /** The ending distance of the spark */
+    distanceEnd: NumericalControl;
     /** The duration of the spark animation */
-    durationMs: number;
+    durationMs: NumericalControl;
     /** The frame rate of the animation */
-    frameRate: number;
+    frameRate: NumericalControl;
     /** The intensity of the spark */
-    intensity: number;
-    /** The maximum distance of the spark */
-    maxDistancePx: number;
-    /** The maximum time between spawning sparks */
-    // maxSpawnIntervalMs: number;
-    /** The minimum distance of the spark */
-    minDistancePx: number;
-    /** The minimum time between spawning sparks */
-    // minSpawnIntervalMs: number;
+    intensity: NumericalControl;
     /** The callback function that is called when a spark is removed */
     onRemove: () => void;
     /** The callback function that is called when a spark is spawned */
@@ -33,15 +27,15 @@ export type SparkConfig = {
     /** The bezier curve definition which controls the opacity of the spark over time */
     opacityEasing: [number, number, number, number];
     /** The ending opacity of the spark */
-    opacityEnd: number;
+    opacityEnd: NumericalControl;
     /** The starting opacity of the spark */
-    opacityStart: number;
+    opacityStart: NumericalControl;
     /** The bezier curve definition which controls the scale of the spark over time */
     scaleEasing: [number, number, number, number];
     /** The ending scale of the spark */
-    scaleEnd: number;
+    scaleEnd: NumericalControl;
     /** The starting scale of the spark */
-    scaleStart: number;
+    scaleStart: NumericalControl;
     /** The interval between spawning sparks */
     spawnIntervalMs: NumericalControl;
 };
@@ -50,22 +44,19 @@ export const SparkConfigSchema = v.object({
     active: v.boolean(),
     components: v.array(v.any()),
     distanceEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
-    distanceStart: v.number(),
-    durationMs: v.pipe(v.number(), v.toMinValue(0)),
-    frameRate: v.pipe(v.number(), v.toMinValue(0)),
-    intensity: v.pipe(v.number(), v.toMinValue(0)),
-    maxDistancePx: v.pipe(v.number(), v.toMinValue(0)),
-    // maxSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
-    minDistancePx: v.pipe(v.number(), v.toMinValue(0)),
-    // minSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
+    distanceStart: NumericalControlSchema,
+    distanceEnd: NumericalControlSchema,
+    durationMs: NumericalControlSchema,
+    frameRate: NumericalControlSchema,
+    intensity: NumericalControlSchema,
     onRemove: v.function(),
     onSpawn: v.function(),
     opacityEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
-    opacityEnd: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(1)),
-    opacityStart: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(1)),
+    opacityEnd: NumericalControlSchema,
+    opacityStart: NumericalControlSchema,
     scaleEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
-    scaleEnd: v.pipe(v.number(), v.toMinValue(0)),
-    scaleStart: v.pipe(v.number(), v.toMinValue(0)),
+    scaleEnd: NumericalControlSchema,
+    scaleStart: NumericalControlSchema,
     spawnIntervalMs: NumericalControlSchema,
 });
 
@@ -77,10 +68,7 @@ export const defaultSparkConfig: SparkConfig = {
     durationMs: 1000,
     frameRate: 50,
     intensity: 1,
-    maxDistancePx: 600,
-    // maxSpawnIntervalMs: 500,
-    minDistancePx: 200,
-    // minSpawnIntervalMs: 50,
+    distanceEnd: {value: 400, variation: {type: VariationType.PlusMinus, unit: VariationUnit.Percent, value: 50}},
     onRemove: () => {},
     onSpawn: () => {},
     opacityEasing: [0.25, 0, 0.8, 1.2],
@@ -90,7 +78,7 @@ export const defaultSparkConfig: SparkConfig = {
     scaleEnd: 5,
     scaleStart: 0.5,
     spawnIntervalMs: {
-        value: 100,
+        value: 500,
         variation: {
             type: VariationType.PlusMinus,
             unit: VariationUnit.Percent,
