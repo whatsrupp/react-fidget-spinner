@@ -7,6 +7,7 @@ import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 import {createId} from './createId';
 import classes from './Sparks.module.css';
+import {toNumber} from './NumericalControl';
 
 /**
  * `Sparks` is a standalone particle spawner component
@@ -37,8 +38,6 @@ import classes from './Sparks.module.css';
 export const Sparks = (config: Partial<SparkConfig>) => {
     const {
         components,
-        minSpawnIntervalMs,
-        maxSpawnIntervalMs,
         durationMs,
         distanceStart,
         maxDistancePx,
@@ -54,6 +53,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         onRemove,
         frameRate,
         active,
+        spawnIntervalMs,
     } = buildSparkConfig(config);
 
     const [sparkMap, setSparkMap] = useState<Record<string, SparkProps>>({});
@@ -81,7 +81,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
     );
 
     const lastSpawnTime = useRef(performance.now());
-    const spawnInterval = useRef(minSpawnIntervalMs);
+    const spawnInterval = useRef(toNumber(spawnIntervalMs));
 
     const spawnLoop = useCallback(() => {
         const time = performance.now();
@@ -90,8 +90,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         if (elapsed > spawnInterval.current) {
             lastSpawnTime.current = time;
 
-            const newInterval = minSpawnIntervalMs + Math.random() * (maxSpawnIntervalMs - minSpawnIntervalMs);
-            spawnInterval.current = newInterval;
+            spawnInterval.current = toNumber(spawnIntervalMs);
 
             const id = createId();
             const SparkComponent = components[Math.floor(Math.random() * components.length)];
@@ -127,8 +126,6 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         lastSpawnTime,
         addSpark,
         removeSpark,
-        minSpawnIntervalMs,
-        maxSpawnIntervalMs,
         components,
         durationMs,
         frameRate,
@@ -144,6 +141,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         scaleEasing,
         distanceStart,
         minDistancePx,
+        spawnIntervalMs,
     ]);
 
     useAnimationFrame(spawnLoop, active);

@@ -1,5 +1,8 @@
 import * as v from 'valibot';
 
+import type {NumericalControl} from './NumericalControl';
+import {NumericalControlSchema, VariationType, VariationUnit} from './NumericalControl';
+
 export type SparkConfig = {
     /** Whether the spark spawner is active or not - setting the component as active will stop the animation loop */
     active: boolean;
@@ -18,11 +21,11 @@ export type SparkConfig = {
     /** The maximum distance of the spark */
     maxDistancePx: number;
     /** The maximum time between spawning sparks */
-    maxSpawnIntervalMs: number;
+    // maxSpawnIntervalMs: number;
     /** The minimum distance of the spark */
     minDistancePx: number;
     /** The minimum time between spawning sparks */
-    minSpawnIntervalMs: number;
+    // minSpawnIntervalMs: number;
     /** The callback function that is called when a spark is removed */
     onRemove: () => void;
     /** The callback function that is called when a spark is spawned */
@@ -39,6 +42,8 @@ export type SparkConfig = {
     scaleEnd: number;
     /** The starting scale of the spark */
     scaleStart: number;
+    /** The interval between spawning sparks */
+    spawnIntervalMs: NumericalControl;
 };
 
 export const SparkConfigSchema = v.object({
@@ -50,9 +55,9 @@ export const SparkConfigSchema = v.object({
     frameRate: v.pipe(v.number(), v.toMinValue(0)),
     intensity: v.pipe(v.number(), v.toMinValue(0)),
     maxDistancePx: v.pipe(v.number(), v.toMinValue(0)),
-    maxSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
+    // maxSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
     minDistancePx: v.pipe(v.number(), v.toMinValue(0)),
-    minSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
+    // minSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
     onRemove: v.function(),
     onSpawn: v.function(),
     opacityEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
@@ -61,6 +66,7 @@ export const SparkConfigSchema = v.object({
     scaleEasing: v.tuple([v.number(), v.number(), v.number(), v.number()]),
     scaleEnd: v.pipe(v.number(), v.toMinValue(0)),
     scaleStart: v.pipe(v.number(), v.toMinValue(0)),
+    spawnIntervalMs: NumericalControlSchema,
 });
 
 export const defaultSparkConfig: SparkConfig = {
@@ -72,9 +78,9 @@ export const defaultSparkConfig: SparkConfig = {
     frameRate: 50,
     intensity: 1,
     maxDistancePx: 600,
-    maxSpawnIntervalMs: 500,
+    // maxSpawnIntervalMs: 500,
     minDistancePx: 200,
-    minSpawnIntervalMs: 50,
+    // minSpawnIntervalMs: 50,
     onRemove: () => {},
     onSpawn: () => {},
     opacityEasing: [0.25, 0, 0.8, 1.2],
@@ -83,6 +89,14 @@ export const defaultSparkConfig: SparkConfig = {
     scaleEasing: [0.25, 0, 0.8, 1.2],
     scaleEnd: 5,
     scaleStart: 0.5,
+    spawnIntervalMs: {
+        value: 100,
+        variation: {
+            type: VariationType.PlusMinus,
+            unit: VariationUnit.Percent,
+            value: 50,
+        },
+    },
 };
 
 export const buildSparkConfig = (sparkConfigOverrides: Partial<SparkConfig> = {}) => {
