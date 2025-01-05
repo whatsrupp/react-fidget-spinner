@@ -22,7 +22,6 @@ import {useConfig} from './useConfig';
 import type {ClickConfig} from './ClickConfig';
 import {buildClickConfig} from './ClickConfig';
 const containerId = 'fidget-spinner-container';
-import {toNumber} from './NumericControl';
 
 type FidgetSpinnerProps = {
     /** Configuration that gets passed to the underlying `Bubbles` particle spawner component*/
@@ -376,7 +375,9 @@ export const FidgetSpinner = ({
             <div
                 onClick={e => {
                     addEnergy();
-                    triggerMouseClickAnimation(e, clickConfig);
+                    if (clickConfig.active) {
+                        triggerMouseClickAnimation(e, clickConfig);
+                    }
                 }}
                 className={classes.spinnerContainer}
                 style={{
@@ -397,6 +398,8 @@ function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>, clickCo
     explosion.className = classes.mouseClick;
     explosion.style.left = `${e.pageX}px`;
     explosion.style.top = `${e.pageY}px`;
+    // currently hardcoded to 300ms in the css
+    const durationMs = 300;
 
     document.body.appendChild(explosion);
     clickConfig.onSpawn();
@@ -408,5 +411,5 @@ function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>, clickCo
     setTimeout(() => {
         explosion.remove();
         clickConfig.onRemove();
-    }, toNumber(clickConfig.durationMs));
+    }, durationMs);
 }
