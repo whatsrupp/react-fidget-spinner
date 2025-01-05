@@ -8,12 +8,18 @@ import type {ScaleConfig} from './ScaleConfig';
 import {buildScaleConfig, ScaleConfigSchema} from './ScaleConfig';
 import type {ResetConfig} from './ResetConfig';
 import {buildResetConfig, ResetConfigSchema} from './ResetConfig';
+import type {SpinnerConfig} from './SpinnerConfig';
+import {buildSpinnerConfig, SpinnerConfigSchema} from './SpinnerConfig';
+import type {ClickConfig} from './ClickConfig';
+import {buildClickConfig, ClickConfigSchema} from './ClickConfig';
 
 const VelocityBreakpointConfigSchema = v.object({
     scaleConfig: ScaleConfigSchema,
     bubbleConfig: BubbleConfigSchema,
     sparkConfig: SparkConfigSchema,
     resetConfig: ResetConfigSchema,
+    spinnerConfig: SpinnerConfigSchema,
+    clickConfig: ClickConfigSchema,
 });
 
 export const VelocityBreakpointSchema = v.object({
@@ -53,6 +59,8 @@ type VelocityBreakpointConfigInput = {
     bubbleConfig?: Partial<BubbleConfig>;
     sparkConfig?: Partial<SparkConfig>;
     resetConfig?: Partial<ResetConfig>;
+    spinnerConfig?: Partial<SpinnerConfig>;
+    clickConfig?: Partial<ClickConfig>;
 };
 
 export type VelocityBreakpointInput = {
@@ -65,7 +73,7 @@ export type VelocityBreakpointsInput = VelocityBreakpointInput[];
 export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput) => {
     const {breakpoint, config} = breakpointInput;
 
-    const {scaleConfig, bubbleConfig, sparkConfig, resetConfig} = config;
+    const {scaleConfig, bubbleConfig, sparkConfig, resetConfig, spinnerConfig, clickConfig} = config;
 
     return v.parse(VelocityBreakpointSchema, {
         breakpoint,
@@ -74,6 +82,8 @@ export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput
             bubbleConfig: buildBubbleConfig(bubbleConfig),
             sparkConfig: buildSparkConfig(sparkConfig),
             resetConfig: buildResetConfig(resetConfig),
+            spinnerConfig: buildSpinnerConfig(spinnerConfig),
+            clickConfig: buildClickConfig(clickConfig),
         },
     });
 };
@@ -101,6 +111,14 @@ export const buildVelocityBreakpoints = (
             resetConfig: {
                 ...baseConfig.resetConfig,
                 ...breakpointInputConfig.resetConfig,
+            },
+            spinnerConfig: {
+                ...baseConfig.spinnerConfig,
+                ...breakpointInputConfig.spinnerConfig,
+            },
+            clickConfig: {
+                ...baseConfig.clickConfig,
+                ...breakpointInputConfig.clickConfig,
             },
         };
 

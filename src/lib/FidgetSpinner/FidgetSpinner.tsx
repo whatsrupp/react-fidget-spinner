@@ -18,12 +18,15 @@ import {buildSparkConfig} from './SparkConfig';
 import type {VelocityBreakpointsInput, VelocityBreakpoints} from './VelocityBreakpoints';
 import {buildVelocityBreakpoints} from './VelocityBreakpoints';
 import classes from './FidgetSpinner.module.css';
+import {useConfig} from './useConfig';
+import type {ClickConfig} from './ClickConfig';
+import {buildClickConfig} from './ClickConfig';
+const containerId = 'fidget-spinner-container';
 
 type FidgetSpinnerProps = {
     /** Configuration that gets passed to the underlying `Bubbles` particle spawner component*/
     bubbleConfig?: Partial<BubbleConfig>;
-    /** Id passed to the outermost div that wraps `children` */
-    containerId?: string;
+
     /** Configuration for the resetting animation */
     resetConfig?: Partial<ResetConfig>;
     /** Configuration for the animation that happens when the FidgetSpinner changes in size */
@@ -34,6 +37,8 @@ type FidgetSpinnerProps = {
     spinnerConfig?: Partial<SpinnerConfig>;
     /** An array of configuration changes that trigger when the velocity of the fidget spinner gets to `x%` of its `maxAngularVelocity` */
     velocityBreakpoints?: VelocityBreakpointsInput;
+    /** Configuration for the mouse click animation */
+    clickConfig?: Partial<ClickConfig>;
 };
 
 /**
@@ -77,34 +82,50 @@ type FidgetSpinnerProps = {
 export const FidgetSpinner = ({
     bubbleConfig: bubbleConfigOverrides,
     children,
-    containerId = 'fidget-spinner-container',
     resetConfig: resetConfigOverrides,
     scaleConfig: scaleConfigOverrides,
     sparkConfig: sparkConfigOverrides,
     spinnerConfig: spinnerConfigOverrides,
     velocityBreakpoints: velocityBreakpointsOverrides,
+    clickConfig: clickConfigOverrides,
 }: PropsWithChildren<FidgetSpinnerProps>) => {
-    const defaultScaleConfig = buildScaleConfig(scaleConfigOverrides);
-    const defaultResetConfig = buildResetConfig(resetConfigOverrides);
-    const defaultBubbleConfig = buildBubbleConfig(bubbleConfigOverrides);
-    const defaultSparkConfig = buildSparkConfig(sparkConfigOverrides);
-    const defaultSpinnerConfig = buildSpinnerConfig(spinnerConfigOverrides);
+    const [scaleConfig, setScaleConfig, baseScaleConfig, resetScaleConfig] = useConfig(
+        scaleConfigOverrides,
+        buildScaleConfig
+    );
+    const [resetConfig, setResetConfig, baseResetConfig, resetResetConfig] = useConfig(
+        resetConfigOverrides,
+        buildResetConfig
+    );
+    const [sparkConfig, setSparkConfig, baseSparkConfig, resetSparkConfig] = useConfig(
+        sparkConfigOverrides,
+        buildSparkConfig
+    );
+    const [spinnerConfig, setSpinnerConfig, baseSpinnerConfig, resetSpinnerConfig] = useConfig(
+        spinnerConfigOverrides,
+        buildSpinnerConfig
+    );
+    const [bubbleConfig, setBubbleConfig, baseBubbleConfig, resetBubbleConfig] = useConfig(
+        bubbleConfigOverrides,
+        buildBubbleConfig
+    );
+
+    const [clickConfig, setClickConfig, baseClickConfig, resetClickConfig] = useConfig(
+        clickConfigOverrides,
+        buildClickConfig
+    );
 
     const baseConfig = {
-        scaleConfig: defaultScaleConfig,
-        resetConfig: defaultResetConfig,
-        bubbleConfig: defaultBubbleConfig,
-        sparkConfig: defaultSparkConfig,
-        spinnerConfig: defaultSpinnerConfig,
+        scaleConfig: baseScaleConfig,
+        resetConfig: baseResetConfig,
+        bubbleConfig: baseBubbleConfig,
+        sparkConfig: baseSparkConfig,
+        spinnerConfig: baseSpinnerConfig,
+        clickConfig: baseClickConfig,
     };
 
     const velocityBreakpoints: VelocityBreakpoints = buildVelocityBreakpoints(velocityBreakpointsOverrides, baseConfig);
 
-    const [scaleConfig, setScaleConfig] = useState(defaultScaleConfig);
-    const [resetConfig, setResetConfig] = useState(defaultResetConfig);
-    const [bubbleConfig, setBubbleConfig] = useState(defaultBubbleConfig);
-    const [sparkConfig, setSparkConfig] = useState(defaultSparkConfig);
-    const [spinnerConfig] = useState(defaultSpinnerConfig);
     const [angleRadians, setAngleRadians] = useState(spinnerConfig.initialAngle);
     const angleRadiansRef = useRef(spinnerConfig.initialAngle);
     const angularVelocityRef = useRef(spinnerConfig.initialAngularVelocity);
@@ -116,10 +137,10 @@ export const FidgetSpinner = ({
     const initialScaleRef = useRef<number | null>(null);
     const targetScaleRef = useRef<number | null>(null);
     const isScalingRef = useRef(false);
-    const scaleRef = useRef(defaultScaleConfig.scale);
+    const scaleRef = useRef(baseScaleConfig.scale);
     const currentBreakpointConfigRef = useRef<number | null>(null);
 
-    const [scale, setScale] = useState(defaultScaleConfig.scale);
+    const [scale, setScale] = useState(baseScaleConfig.scale);
     const [isActive, setIsActive] = useState(false);
 
     const sortedBreakpoints = useMemo(() => {
@@ -135,11 +156,13 @@ export const FidgetSpinner = ({
     }, [sortedBreakpoints, spinnerConfig.maxAngularVelocity]);
 
     const resetConfigs = useCallback(() => {
-        setSparkConfig(defaultSparkConfig);
-        setBubbleConfig(defaultBubbleConfig);
-        setScaleConfig(defaultScaleConfig);
-        setResetConfig(defaultResetConfig);
-    }, [defaultSparkConfig, defaultBubbleConfig, defaultScaleConfig, defaultResetConfig]);
+        resetSparkConfig();
+        resetBubbleConfig();
+        resetScaleConfig();
+        resetResetConfig();
+        resetSpinnerConfig();
+        resetClickConfig();
+    }, [resetSparkConfig, resetBubbleConfig, resetScaleConfig, resetResetConfig, resetSpinnerConfig, resetClickConfig]);
 
     const startScaling = useCallback(
         ({newScale = 1}: {newScale?: number}) => {
@@ -279,9 +302,19 @@ export const FidgetSpinner = ({
                 if (newResetConfig) {
                     setResetConfig(newResetConfig);
                 }
+
+                const newSpinnerConfig = currentBreakpoint?.config.spinnerConfig;
+                if (newSpinnerConfig) {
+                    setSpinnerConfig(newSpinnerConfig);
+                }
+
+                const newClickConfig = currentBreakpoint?.config.clickConfig;
+                if (newClickConfig) {
+                    setClickConfig(newClickConfig);
+                }
             } else if (!currentBreakpoint && currentBreakpointConfigRef.current !== null) {
                 currentBreakpointConfigRef.current = null;
-                startScaling({newScale: defaultScaleConfig.scale});
+                startScaling({newScale: baseScaleConfig.scale});
                 resetConfigs();
             }
 
@@ -305,7 +338,13 @@ export const FidgetSpinner = ({
             resetConfig,
             getCurrentBreakpoint,
             resetConfigs,
-            defaultScaleConfig,
+            baseScaleConfig,
+            setScaleConfig,
+            setBubbleConfig,
+            setSparkConfig,
+            setResetConfig,
+            setSpinnerConfig,
+            setClickConfig,
         ]
     );
 
@@ -336,7 +375,9 @@ export const FidgetSpinner = ({
             <div
                 onClick={e => {
                     addEnergy();
-                    triggerMouseClickAnimation(e);
+                    if (clickConfig.active) {
+                        triggerMouseClickAnimation(e, clickConfig);
+                    }
                 }}
                 className={classes.spinnerContainer}
                 style={{
@@ -352,20 +393,16 @@ export const FidgetSpinner = ({
     );
 };
 
-const clickConfig = {
-    component: null,
-    durationMs: 300,
-    onClickSpawn: () => {},
-    onClickRemove: () => {},
-};
-function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>) {
+function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>, clickConfig: ClickConfig) {
     const explosion = document.createElement('div');
     explosion.className = classes.mouseClick;
     explosion.style.left = `${e.pageX}px`;
     explosion.style.top = `${e.pageY}px`;
+    // currently hardcoded to 300ms in the css
+    const durationMs = 300;
 
     document.body.appendChild(explosion);
-    clickConfig.onClickSpawn();
+    clickConfig.onSpawn();
     requestAnimationFrame(() => {
         explosion.style.transform = 'translate(-50%, -50%) scale(1)';
         explosion.style.opacity = '0';
@@ -373,6 +410,6 @@ function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>) {
 
     setTimeout(() => {
         explosion.remove();
-        clickConfig.onClickRemove();
-    }, clickConfig.durationMs);
+        clickConfig.onRemove();
+    }, durationMs);
 }

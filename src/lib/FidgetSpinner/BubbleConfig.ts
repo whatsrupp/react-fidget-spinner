@@ -1,6 +1,7 @@
 import * as v from 'valibot';
 
 import {EasingSchema} from './toBezierEasing';
+import {VariationType, VariationUnit, type NumericControl, NumericControlSchema} from './NumericControl';
 
 export type BubbleConfig = {
     /** Whether the bubble spawner is active or not - setting the component as active will stop the animation loop */
@@ -8,111 +9,107 @@ export type BubbleConfig = {
     /** The components to use for the bubbles - each bubble will be a random component from this array */
     components: React.ReactNode[];
     /** The duration of the bubble animation */
-    durationMs: number;
-    /** The randomness in the duration of the bubble animation */
-    durationMsRandomness: number;
+    durationMs: NumericControl;
     /** The ending scale of the bubble */
-    scaleEnd: number;
-    /** The randomness in the ending scale of the bubble */
-    scaleEndRandomness: number;
+    scaleEnd: NumericControl;
     /** The frame rate of the animation */
     frameRate: number;
-    /** The maximum time between spawning bubbles */
-    maxSpawnIntervalMs: number;
-    /** The minimum time between spawning bubbles */
-    minSpawnIntervalMs: number;
     /** The callback function that is called when a bubble is removed */
     onRemove: () => void;
     /** The callback function that is called when a bubble is spawned */
     onSpawn: () => void;
     /** The ending opacity of the bubble */
-    opacityEnd: number;
+    opacityEnd: NumericControl;
     /** The bezier curve definition which controls the opacity of the bubble over time */
     opacityEasing: [number, number, number, number];
     /** The starting opacity of the bubble */
-    opacityStart: number;
+    opacityStart: NumericControl;
     /** The bezier curve definition which controls the scale of the bubble over time */
     scaleEasing: [number, number, number, number];
     /** The starting scale of the bubble */
-    scaleStart: number;
-    /** The randomness in the starting scale of the bubble */
-    scaleStartRandomness: number;
+    scaleStart: NumericControl;
     /** The amplitude of the wobble animation */
-    wobbleAmplitude: number;
-    /** The randomness in the amplitude of the wobble animation */
-    wobbleAmplitudeRandomness: number;
+    wobbleAmplitude: NumericControl;
     /** The frequency of the wobble animation */
-    wobbleFrequency: number;
-    /** The randomness in the frequency of the wobble animation */
-    wobbleFrequencyRandomness: number;
+    wobbleFrequency: NumericControl;
     /** The randomness in the x position of the bubble */
-    xOffsetRandomness: number;
+    xStart: NumericControl;
     /** The bezier curve definition which controls the y position of the bubble over time */
     yEasing: [number, number, number, number];
     /** The y position of the bubble when it reaches the end of its animation - nb: +ve `y` is up (which is the opposite of the html definition of positive y) */
-    yEnd: number;
-    /** The randomness in the y position of the bubble when it reaches the end of its animation */
-    yRandomness: number;
+    yEnd: NumericControl;
     /** The starting y position of the bubble */
-    yStart: number;
+    yStart: NumericControl;
+    /** The interval between spawns */
+    spawnIntervalMs: NumericControl;
 };
 
 export const BubbleConfigSchema = v.object({
     active: v.boolean(),
     components: v.array(v.string()),
-    durationMs: v.pipe(v.number(), v.toMinValue(0)),
-    durationMsRandomness: v.pipe(v.number(), v.toMinValue(0)),
-    scaleEnd: v.pipe(v.number(), v.toMinValue(0)),
-    scaleEndRandomness: v.pipe(v.number(), v.toMinValue(0)),
+    durationMs: NumericControlSchema,
+    scaleEnd: NumericControlSchema,
     frameRate: v.pipe(v.number(), v.toMinValue(0)),
-    maxSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
-    minSpawnIntervalMs: v.pipe(v.number(), v.toMinValue(0)),
+    spawnIntervalMs: NumericControlSchema,
     onRemove: v.function(),
     onSpawn: v.function(),
     opacityEasing: EasingSchema,
-    opacityEnd: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(1)),
-    opacityStart: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(1)),
+    opacityEnd: NumericControlSchema,
+    opacityStart: NumericControlSchema,
     scaleEasing: EasingSchema,
-    scaleStart: v.pipe(v.number(), v.toMinValue(0)),
-    scaleStartRandomness: v.pipe(v.number(), v.toMinValue(0)),
-    wobbleAmplitude: v.pipe(v.number(), v.toMinValue(0)),
-    wobbleAmplitudeRandomness: v.pipe(v.number(), v.toMinValue(0)),
-    wobbleFrequency: v.pipe(v.number(), v.toMinValue(0)),
-    wobbleFrequencyRandomness: v.pipe(v.number(), v.toMinValue(0)),
-    xOffsetRandomness: v.pipe(v.number(), v.toMinValue(0)),
+    scaleStart: NumericControlSchema,
+    wobbleAmplitude: NumericControlSchema,
+    wobbleFrequency: NumericControlSchema,
     yEasing: EasingSchema,
-    yEnd: v.number(),
-    yRandomness: v.pipe(v.number(), v.toMinValue(0)),
-    yStart: v.number(),
+    yEnd: NumericControlSchema,
+    yStart: NumericControlSchema,
+    xStart: NumericControlSchema,
 });
 
 export const defaultBubbleConfig: BubbleConfig = {
     active: false,
     components: ['💸', '🔥'],
-    durationMs: 1500,
-    durationMsRandomness: 1000,
-    scaleEnd: 2,
-    scaleEndRandomness: 0.2,
+    durationMs: {
+        value: 1000,
+        variation: {type: VariationType.Plus, unit: VariationUnit.Absolute, value: 1000},
+    },
+    scaleEnd: {
+        value: 2,
+        variation: {type: VariationType.PlusMinus, unit: VariationUnit.Percent, value: 20},
+    },
     frameRate: 60,
-    maxSpawnIntervalMs: 1000,
-    minSpawnIntervalMs: 200,
+    spawnIntervalMs: {
+        value: 600,
+        variation: {type: VariationType.PlusMinus, unit: VariationUnit.Absolute, value: 400},
+    },
     onRemove: () => {},
     onSpawn: () => {},
     opacityEasing: [0.25, -0.75, 0.8, 1.2],
     opacityEnd: 0,
     opacityStart: 1,
     scaleEasing: [0.25, -0.75, 0.8, 1.2],
-    scaleStart: 1,
-    scaleStartRandomness: 0.5,
-    wobbleAmplitude: 1,
-    wobbleAmplitudeRandomness: 40,
-    wobbleFrequency: 0.1,
-    wobbleFrequencyRandomness: 0.5,
-    xOffsetRandomness: 100,
+    scaleStart: {
+        value: 1,
+        variation: {type: VariationType.PlusMinus, unit: VariationUnit.Percent, value: 50},
+    },
+    wobbleAmplitude: {
+        value: 1,
+        variation: {type: VariationType.Plus, unit: VariationUnit.Absolute, value: 40},
+    },
+    wobbleFrequency: {
+        value: 0.1,
+        variation: {type: VariationType.Plus, unit: VariationUnit.Absolute, value: 0.4},
+    },
     yEasing: [0.25, 0, 0.8, 1.2],
-    yEnd: 100,
-    yRandomness: 200,
+    yEnd: {
+        value: 100,
+        variation: {type: VariationType.Plus, unit: VariationUnit.Absolute, value: 200},
+    },
     yStart: 0,
+    xStart: {
+        value: 0,
+        variation: {type: VariationType.PlusMinus, unit: VariationUnit.Absolute, value: 100},
+    },
 };
 
 export const buildBubbleConfig = (bubbleConfigOverrides: Partial<BubbleConfig> = {}) => {

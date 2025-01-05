@@ -7,6 +7,7 @@ import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 import {createId} from './createId';
 import classes from './Sparks.module.css';
+import {toNumber} from './NumericControl';
 
 /**
  * `Sparks` is a standalone particle spawner component
@@ -37,12 +38,9 @@ import classes from './Sparks.module.css';
 export const Sparks = (config: Partial<SparkConfig>) => {
     const {
         components,
-        minSpawnIntervalMs,
-        maxSpawnIntervalMs,
         durationMs,
         distanceStart,
-        maxDistancePx,
-        minDistancePx,
+        distanceEnd,
         distanceEasing,
         opacityEasing,
         opacityStart,
@@ -54,6 +52,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         onRemove,
         frameRate,
         active,
+        spawnIntervalMs,
     } = buildSparkConfig(config);
 
     const [sparkMap, setSparkMap] = useState<Record<string, SparkProps>>({});
@@ -81,7 +80,7 @@ export const Sparks = (config: Partial<SparkConfig>) => {
     );
 
     const lastSpawnTime = useRef(performance.now());
-    const spawnInterval = useRef(minSpawnIntervalMs);
+    const spawnInterval = useRef(toNumber(spawnIntervalMs));
 
     const spawnLoop = useCallback(() => {
         const time = performance.now();
@@ -90,24 +89,21 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         if (elapsed > spawnInterval.current) {
             lastSpawnTime.current = time;
 
-            const newInterval = minSpawnIntervalMs + Math.random() * (maxSpawnIntervalMs - minSpawnIntervalMs);
-            spawnInterval.current = newInterval;
+            spawnInterval.current = toNumber(spawnIntervalMs);
 
             const id = createId();
             const SparkComponent = components[Math.floor(Math.random() * components.length)];
             const angleRadians = Math.random() * 2 * Math.PI;
 
-            const distanceEnd = distanceStart + Math.random() * (maxDistancePx - minDistancePx);
-
             const sparkProps: SparkProps = {
                 id,
-                durationMs,
-                frameRate,
-                opacityStart,
-                opacityEnd,
+                durationMs: toNumber(durationMs),
+                frameRate: toNumber(frameRate),
+                opacityStart: toNumber(opacityStart),
+                opacityEnd: toNumber(opacityEnd),
                 opacityEasing,
-                distanceStart,
-                distanceEnd,
+                distanceStart: toNumber(distanceStart),
+                distanceEnd: toNumber(distanceEnd),
                 distanceEasing,
                 onSpawn,
                 onRemove,
@@ -115,8 +111,8 @@ export const Sparks = (config: Partial<SparkConfig>) => {
                     removeSpark(id);
                 },
                 angleRadians,
-                scaleStart,
-                scaleEnd,
+                scaleStart: toNumber(scaleStart),
+                scaleEnd: toNumber(scaleEnd),
                 scaleEasing,
                 Component: SparkComponent,
             };
@@ -127,15 +123,12 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         lastSpawnTime,
         addSpark,
         removeSpark,
-        minSpawnIntervalMs,
-        maxSpawnIntervalMs,
         components,
         durationMs,
         frameRate,
         opacityStart,
         opacityEnd,
         opacityEasing,
-        maxDistancePx,
         distanceEasing,
         onSpawn,
         onRemove,
@@ -143,7 +136,8 @@ export const Sparks = (config: Partial<SparkConfig>) => {
         scaleEnd,
         scaleEasing,
         distanceStart,
-        minDistancePx,
+        spawnIntervalMs,
+        distanceEnd,
     ]);
 
     useAnimationFrame(spawnLoop, active);

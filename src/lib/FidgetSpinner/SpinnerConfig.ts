@@ -5,7 +5,7 @@ type SpinnerConfigCallbacks = {
     onClick: () => void;
 };
 
-export const SpinnerConfig = v.object({
+export const SpinnerConfigSchema = v.object({
     dampingCoefficient: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(1)),
     initialAngle: v.pipe(v.number(), v.toMinValue(0), v.toMaxValue(Math.PI * 2)),
     initialAngularVelocity: v.pipe(v.number(), v.toMinValue(0)),
@@ -15,7 +15,7 @@ export const SpinnerConfig = v.object({
     direction: v.union([v.literal('clockwise'), v.literal('antiClockwise')]),
 });
 
-export type SpinnerConfig = Omit<v.InferOutput<typeof SpinnerConfig>, keyof SpinnerConfigCallbacks> &
+export type SpinnerConfig = Omit<v.InferOutput<typeof SpinnerConfigSchema>, keyof SpinnerConfigCallbacks> &
     SpinnerConfigCallbacks;
 
 export const defaultSpinnerConfig: SpinnerConfig = {
@@ -29,7 +29,7 @@ export const defaultSpinnerConfig: SpinnerConfig = {
 };
 
 export const buildSpinnerConfig = (spinnerConfigOverrides: Partial<SpinnerConfig> = {}) => {
-    return v.parse(SpinnerConfig, {
+    return v.parse(SpinnerConfigSchema, {
         ...defaultSpinnerConfig,
         ...spinnerConfigOverrides,
     });
