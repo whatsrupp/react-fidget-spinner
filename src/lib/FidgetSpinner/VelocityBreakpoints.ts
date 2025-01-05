@@ -10,6 +10,8 @@ import type {ResetConfig} from './ResetConfig';
 import {buildResetConfig, ResetConfigSchema} from './ResetConfig';
 import type {SpinnerConfig} from './SpinnerConfig';
 import {buildSpinnerConfig, SpinnerConfigSchema} from './SpinnerConfig';
+import type {ClickConfig} from './ClickConfig';
+import {buildClickConfig, ClickConfigSchema} from './ClickConfig';
 
 const VelocityBreakpointConfigSchema = v.object({
     scaleConfig: ScaleConfigSchema,
@@ -17,6 +19,7 @@ const VelocityBreakpointConfigSchema = v.object({
     sparkConfig: SparkConfigSchema,
     resetConfig: ResetConfigSchema,
     spinnerConfig: SpinnerConfigSchema,
+    clickConfig: ClickConfigSchema,
 });
 
 export const VelocityBreakpointSchema = v.object({
@@ -57,6 +60,7 @@ type VelocityBreakpointConfigInput = {
     sparkConfig?: Partial<SparkConfig>;
     resetConfig?: Partial<ResetConfig>;
     spinnerConfig?: Partial<SpinnerConfig>;
+    clickConfig?: Partial<ClickConfig>;
 };
 
 export type VelocityBreakpointInput = {
@@ -69,7 +73,7 @@ export type VelocityBreakpointsInput = VelocityBreakpointInput[];
 export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput) => {
     const {breakpoint, config} = breakpointInput;
 
-    const {scaleConfig, bubbleConfig, sparkConfig, resetConfig, spinnerConfig} = config;
+    const {scaleConfig, bubbleConfig, sparkConfig, resetConfig, spinnerConfig, clickConfig} = config;
 
     return v.parse(VelocityBreakpointSchema, {
         breakpoint,
@@ -79,6 +83,7 @@ export const buildVelocityBreakpoint = (breakpointInput: VelocityBreakpointInput
             sparkConfig: buildSparkConfig(sparkConfig),
             resetConfig: buildResetConfig(resetConfig),
             spinnerConfig: buildSpinnerConfig(spinnerConfig),
+            clickConfig: buildClickConfig(clickConfig),
         },
     });
 };
@@ -110,6 +115,10 @@ export const buildVelocityBreakpoints = (
             spinnerConfig: {
                 ...baseConfig.spinnerConfig,
                 ...breakpointInputConfig.spinnerConfig,
+            },
+            clickConfig: {
+                ...baseConfig.clickConfig,
+                ...breakpointInputConfig.clickConfig,
             },
         };
 

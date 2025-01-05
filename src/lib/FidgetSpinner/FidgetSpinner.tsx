@@ -19,12 +19,15 @@ import type {VelocityBreakpointsInput, VelocityBreakpoints} from './VelocityBrea
 import {buildVelocityBreakpoints} from './VelocityBreakpoints';
 import classes from './FidgetSpinner.module.css';
 import {useConfig} from './useConfig';
+import type {ClickConfig} from './ClickConfig';
+import {buildClickConfig} from './ClickConfig';
+const containerId = 'fidget-spinner-container';
+import {toNumber} from './NumericControl';
 
 type FidgetSpinnerProps = {
     /** Configuration that gets passed to the underlying `Bubbles` particle spawner component*/
     bubbleConfig?: Partial<BubbleConfig>;
-    /** Id passed to the outermost div that wraps `children` */
-    containerId?: string;
+
     /** Configuration for the resetting animation */
     resetConfig?: Partial<ResetConfig>;
     /** Configuration for the animation that happens when the FidgetSpinner changes in size */
@@ -35,6 +38,8 @@ type FidgetSpinnerProps = {
     spinnerConfig?: Partial<SpinnerConfig>;
     /** An array of configuration changes that trigger when the velocity of the fidget spinner gets to `x%` of its `maxAngularVelocity` */
     velocityBreakpoints?: VelocityBreakpointsInput;
+    /** Configuration for the mouse click animation */
+    clickConfig?: Partial<ClickConfig>;
 };
 
 /**
@@ -78,12 +83,12 @@ type FidgetSpinnerProps = {
 export const FidgetSpinner = ({
     bubbleConfig: bubbleConfigOverrides,
     children,
-    containerId = 'fidget-spinner-container',
     resetConfig: resetConfigOverrides,
     scaleConfig: scaleConfigOverrides,
     sparkConfig: sparkConfigOverrides,
     spinnerConfig: spinnerConfigOverrides,
     velocityBreakpoints: velocityBreakpointsOverrides,
+    clickConfig: clickConfigOverrides,
 }: PropsWithChildren<FidgetSpinnerProps>) => {
     const [scaleConfig, setScaleConfig, baseScaleConfig, resetScaleConfig] = useConfig(
         scaleConfigOverrides,
@@ -106,12 +111,18 @@ export const FidgetSpinner = ({
         buildBubbleConfig
     );
 
+    const [clickConfig, setClickConfig, baseClickConfig, resetClickConfig] = useConfig(
+        clickConfigOverrides,
+        buildClickConfig
+    );
+
     const baseConfig = {
         scaleConfig: baseScaleConfig,
         resetConfig: baseResetConfig,
         bubbleConfig: baseBubbleConfig,
         sparkConfig: baseSparkConfig,
         spinnerConfig: baseSpinnerConfig,
+        clickConfig: baseClickConfig,
     };
 
     const velocityBreakpoints: VelocityBreakpoints = buildVelocityBreakpoints(velocityBreakpointsOverrides, baseConfig);
@@ -151,7 +162,8 @@ export const FidgetSpinner = ({
         resetScaleConfig();
         resetResetConfig();
         resetSpinnerConfig();
-    }, [resetSparkConfig, resetBubbleConfig, resetScaleConfig, resetResetConfig, resetSpinnerConfig]);
+        resetClickConfig();
+    }, [resetSparkConfig, resetBubbleConfig, resetScaleConfig, resetResetConfig, resetSpinnerConfig, resetClickConfig]);
 
     const startScaling = useCallback(
         ({newScale = 1}: {newScale?: number}) => {
@@ -296,6 +308,11 @@ export const FidgetSpinner = ({
                 if (newSpinnerConfig) {
                     setSpinnerConfig(newSpinnerConfig);
                 }
+
+                const newClickConfig = currentBreakpoint?.config.clickConfig;
+                if (newClickConfig) {
+                    setClickConfig(newClickConfig);
+                }
             } else if (!currentBreakpoint && currentBreakpointConfigRef.current !== null) {
                 currentBreakpointConfigRef.current = null;
                 startScaling({newScale: baseScaleConfig.scale});
@@ -328,6 +345,7 @@ export const FidgetSpinner = ({
             setSparkConfig,
             setResetConfig,
             setSpinnerConfig,
+            setClickConfig,
         ]
     );
 
@@ -358,7 +376,7 @@ export const FidgetSpinner = ({
             <div
                 onClick={e => {
                     addEnergy();
-                    triggerMouseClickAnimation(e);
+                    triggerMouseClickAnimation(e, clickConfig);
                 }}
                 className={classes.spinnerContainer}
                 style={{
@@ -374,20 +392,14 @@ export const FidgetSpinner = ({
     );
 };
 
-const clickConfig = {
-    component: null,
-    durationMs: 300,
-    onClickSpawn: () => {},
-    onClickRemove: () => {},
-};
-function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>) {
+function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>, clickConfig: ClickConfig) {
     const explosion = document.createElement('div');
     explosion.className = classes.mouseClick;
     explosion.style.left = `${e.pageX}px`;
     explosion.style.top = `${e.pageY}px`;
 
     document.body.appendChild(explosion);
-    clickConfig.onClickSpawn();
+    clickConfig.onSpawn();
     requestAnimationFrame(() => {
         explosion.style.transform = 'translate(-50%, -50%) scale(1)';
         explosion.style.opacity = '0';
@@ -395,6 +407,6 @@ function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>) {
 
     setTimeout(() => {
         explosion.remove();
-        clickConfig.onClickRemove();
-    }, clickConfig.durationMs);
+        clickConfig.onRemove();
+    }, toNumber(clickConfig.durationMs));
 }
