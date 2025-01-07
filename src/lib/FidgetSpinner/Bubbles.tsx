@@ -7,7 +7,6 @@ import {toBezierEasing} from './toBezierEasing';
 import type {BubbleConfig} from './BubbleConfig';
 import {buildBubbleConfig} from './BubbleConfig';
 import {createId} from './createId';
-import classes from './Bubbles.module.css';
 import {toNumber} from './NumericControl';
 
 /**
@@ -180,7 +179,10 @@ export const Bubbles = (config: Partial<BubbleConfig>) => {
     useAnimationFrame(spawnLoop, active);
 
     return (
-        <div className={classes.bubbles}>
+        <div
+            style={{
+                position: 'relative',
+            }}>
             {bubbles.map(bubbleProps => (
                 <Bubble key={bubbleProps.id} {...bubbleProps} />
             ))}
@@ -301,10 +303,15 @@ export const Bubble = ({
 
     return (
         <div
-            className={classes.bubble}
             style={{
+                left: '50%',
+                top: '50%',
+                position: 'absolute',
                 scale: bubbleState.scale,
                 opacity: bubbleState.opacity.toString(),
+                userSelect: 'none',
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
                 transform: `translate(calc(${bubbleState.x}px - 50%), calc(${bubbleState.y}px - 50%)) scale(${bubbleState.scale})`,
             }}>
             {children}

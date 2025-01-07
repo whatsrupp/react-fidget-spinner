@@ -17,7 +17,6 @@ import type {SparkConfig} from './SparkConfig';
 import {buildSparkConfig} from './SparkConfig';
 import type {VelocityBreakpointsInput, VelocityBreakpoints} from './VelocityBreakpoints';
 import {buildVelocityBreakpoints} from './VelocityBreakpoints';
-import classes from './FidgetSpinner.module.css';
 import {useConfig} from './useConfig';
 import type {ClickConfig} from './ClickConfig';
 import {buildClickConfig} from './ClickConfig';
@@ -371,7 +370,14 @@ export const FidgetSpinner = ({
     const directionAdjustedAngle = spinnerConfig.direction === 'clockwise' ? angleRadians : -angleRadians;
 
     return (
-        <div id={containerId} className={classes.fidgetSpinnerContainer}>
+        <div
+            id={containerId}
+            style={{
+                position: 'relative',
+                userSelect: 'none',
+                MozUserSelect: 'none',
+                WebkitUserSelect: 'none',
+            }}>
             <div
                 onClick={e => {
                     addEnergy();
@@ -379,13 +385,21 @@ export const FidgetSpinner = ({
                         triggerMouseClickAnimation(e, clickConfig);
                     }
                 }}
-                className={classes.spinnerContainer}
                 style={{
+                    cursor: 'pointer',
+                    position: 'absolute',
+                    left: '50%',
+                    top: '50%',
+                    userSelect: 'none',
+                    MozUserSelect: 'none',
+                    WebkitUserSelect: 'none',
+                    WebkitTapHighlightColor: 'transparent',
                     transform: `translate(-50%, -50%) rotate(${directionAdjustedAngle}rad) scale(${scale})`,
+                    zIndex: 100,
                 }}>
                 {children}
             </div>
-            <div className={classes.particlesContainer}>
+            <div style={{position: 'relative', left: '50%', top: '50%'}}>
                 <Bubbles {...bubbleConfig} active={isActive} />
                 <Sparks {...sparkConfig} active={isActive} />
             </div>
@@ -395,10 +409,18 @@ export const FidgetSpinner = ({
 
 function triggerMouseClickAnimation(e: React.MouseEvent<HTMLDivElement>, clickConfig: ClickConfig) {
     const explosion = document.createElement('div');
-    explosion.className = classes.mouseClick;
     explosion.style.left = `${e.pageX}px`;
     explosion.style.top = `${e.pageY}px`;
-    // currently hardcoded to 300ms in the css
+    explosion.style.zIndex = '200';
+    explosion.style.background = 'rgb(255 0 0 / 80%)';
+    explosion.style.borderRadius = '50%';
+    explosion.style.height = '40px';
+    explosion.style.pointerEvents = 'none';
+    explosion.style.position = 'absolute';
+    explosion.style.transform = 'translate(-50%, -50%) scale(0)';
+    explosion.style.transition = 'all 300ms ease-out';
+    explosion.style.width = '40px';
+    explosion.style.zIndex = '200';
     const durationMs = 300;
 
     document.body.appendChild(explosion);
