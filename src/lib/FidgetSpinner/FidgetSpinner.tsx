@@ -22,7 +22,7 @@ import type {ClickConfig} from './ClickConfig';
 import {buildClickConfig} from './ClickConfig';
 const containerId = 'fidget-spinner-container';
 
-type FidgetSpinnerProps = {
+export type FidgetSpinnerProps = {
     /** Configuration that gets passed to the underlying `Bubbles` particle spawner component*/
     bubbleConfig?: Partial<BubbleConfig>;
 
