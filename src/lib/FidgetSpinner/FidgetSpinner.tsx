@@ -21,6 +21,7 @@ import {useConfig} from './useConfig';
 import type {ClickConfig} from './ClickConfig';
 import {buildClickConfig} from './ClickConfig';
 const containerId = 'fidget-spinner-container';
+import {toNumber} from './NumericControl';
 
 export type FidgetSpinnerProps = {
     /** Configuration that gets passed to the underlying `Bubbles` particle spawner component*/
@@ -361,9 +362,8 @@ export const FidgetSpinner = ({
             cancelReset();
         }
         setIsActive(true);
-        const multiplier = 0.9;
-        angularVelocityRef.current = angularVelocityRef.current + Math.PI * 2 * multiplier;
-    }, [cancelReset]);
+        angularVelocityRef.current = angularVelocityRef.current + toNumber(clickConfig.angularVelocityPerClick);
+    }, [cancelReset, clickConfig]);
 
     useAnimationFrame(animation);
 
