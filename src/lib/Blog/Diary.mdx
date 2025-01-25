@@ -1,0 +1,123 @@
+import { Meta, ArgTypes, Story, Canvas, Source, Markdown, Primary } from "@storybook/blocks";
+
+<Meta title="Blog/Diary" />
+# Development Diary
+
+I've jotted down some key decisions about this project, some learnings and a very brief diary of the project.
+
+Hopefully this will be nice to come back to in a few years 🪿
+
+
+
+## Decision Drivers 🏎️
+
+A short list of the main drivers around the project and what actions I took to address them.
+
+- Initially wanted to make a silly animation when feeling a bit ill, it also was possibly a fun easter egg for someting at work
+    - Spike with AI
+- Animation was very satisfying to use (from my perspective) 
+    - I wanted to be able to use it in react - Find template project and make it my own
+- I wanted to make the ai spike more grounded in physics rather than some fairly sketch ai initial work
+    - rework and refactor the spike
+- I wanted the state of the spinner to be able to interact with other aspects of animation
+    - Velocity breakpointing added, this is the most complicated aspect of the project, it makes the animations really cool but I don’t think people will “Get” this feature - you need to be quite in the weeds to get the most value out of it.
+- I wanted to be able to own the project but also allow people to use the package in an open source way, there is clearly an appetite for quick fun given packages like react-confetti 
+    - Published it on npm
+- I wanted the project to be highly customisable and configurable 
+    - had to double down on consistent config building with objects in react
+- I wanted the config to be easily documentable and also well documented 
+    - learnt about and used storybook
+- I wanted to be able to express variety in numerical expressions succinctly and clearly 
+    - NumericControl introduced
+
+
+## Key Project Takeaways/ Learnings 🧠
+- Taking a component and making it into a package that other people can actually use is hard work
+    - Interface, is it clear, can it be used quickly
+    - Docs, are things explained
+    - Defaults, are they sensible
+    - Edge cases, are they validated
+    - Handling Breaking interface changes
+- Storybook is good but doesn’t deal with a few things that well
+    - Deep objects in props isn’t great
+    - Creating Documentation around types and non component related concepts automatically, but there might be  other better ways to do that
+    - Storybook exposes uneditable examples as whole webpages
+    - Can host for free using GitHub pages
+    - Mobile storybook isn’t great when it comes to editing config
+    - Storybook type inference isn’t great when it comes to documenting props
+    - Can’t change the rendered component/ add react props in the configuration editor
+- Expressing variety in animations is fairly complicated
+- Found myself somewhat wanting to replicate the css animation interface without realising it until later
+- Is the react animation loop that I have chosen performant and how can I test it
+- Publishing a package was fairly simple with the template setup
+- CSS modules are a good way to write a package because it compiles down and avoids vendor prefixing
+- Need to work out a good way to host images / gifs in docs 
+- Knowing what the right things to be consistent on at the start is hard, it was good to wait a bit with a few concepts eg the variation/ Numeric control and useConfig
+- Even if you scope a package to be very limited there’s still a lot of overhead, but in general it is nice to work on something a lot smaller that you can make daily changes to and then release. This was nice on holiday and also for doing a project in a non stressful way. 
+- 700ish people have downloaded the package which is cool, although the numbers are a bit naive, there is marketing needed when creating a package - not sure which channels are best, software engineering friends is not enough network, might need reddit/ hackernews/ other more nerdy forum spaces
+- You need to see people actually using the thing, lots of surprises when asking people to 
+- Need a good platform for non technical people to try it out and also act as a bit of a buzz.
+- Making interactive animations is really really satisfying (for me)
+
+## Diary 📖
+
+Sat 14th December 2024
+- Start
+- Spike using AI
+
+Sun 15th 
+- General react project template setup
+- Rough refactoring into react from the initial spike
+
+Wed 18th
+- Create Gif, make the project template my own and remove guff
+- Actually publish the package and claim react-fidget-spinner
+
+Sun 22nd 
+- Extract out Bubble and Spark concepts into spawner components and give them space in the storybook
+
+Wed 25th
+- Make use of the bubble and spark spawner
+
+Thurs 26th 
+- Make bubbles and sparks a lot more customisable by allowing react nodes
+
+Friday 27th
+- Extract out everything into config which was a big job, also generally working out the structure of config from a what are the different “blocks” perspective and setting good defaults and how to handle defaults 
+
+Sat 28th
+- Really learn about what’s possible with storybook in terms of generating docs and components
+- Try and get the docs looking nice but the types and default overriding wasn’t particularly compatible with storybooks approach, ie I want people to pass in overrides for multiple complicated objects
+
+Sun 29th
+- Work to get “MVP” release actually out there
+-  and really get stuck into writing the docs
+- Enable turning off of sparks and bubbles
+- Checking storybook works a bit etc
+
+30th
+- Fly to Berlin
+- Wrap up docs on the plane
+- Add various discoverablility things in npm - name keywords etc
+- Fix some bugs around the gifs not being visible
+
+
+Wed 1st 2025
+- Fix bug around the border select colour on phones, adopted vendor prefix approach
+- Change approach with breakpointing where the breakpoints “Build on” the base config rather than replacing them, this made them much easier to define. It might be even easier in the future to define breakpoints by building on the last breakpoint so you don’t have to define a property everytime.
+
+Thurs 2nd 
+- Add storybook badge and add docs on velocity breakpoints
+- Make some more examples and post about it on instagram
+- Add deep controls to the docs so that the control inputs are a bit better
+
+Sat 4th 
+- Introduce the concept of a NumericControl - this allows you to define a number but also the variation of that number as a starting point for an animation - ie it becomes a number that can cover a defined range in a number of ways, by percentage or absolute terms - it might be nice to expand this to include just an absolute range
+
+Sun 5th Jan 2025
+- Coding while waiting for a delayed flight
+- Use the new numeric controls
+- Create a useConfig hook - it allows config to be overwritten and reinitialised in an efficient way. It also standardises the approach for resetting and setting the config. There was bug where, if you updated the initial config it wouldn’t reset the config which had become saved in state.
+- Add config for clicker components
+- Add clickConfig and actual spinner config to the velocity breakpoints so that all config can be managed in the same way and be controlled from breakpoints
+- Write a bit of a dev diary on the plane and some reflection

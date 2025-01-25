@@ -1,23 +1,24 @@
 import { Meta, ArgTypes, Story, Canvas, Source, Markdown, Primary } from "@storybook/blocks";
 import * as FidgetSpinnerStories from "./FidgetSpinner/FidgetSpinner.stories"
 
-<Meta title="Welcome" of={FidgetSpinnerStories} />
+<Meta title="Welcome"/>
+
 
 
 # 🪿 React Fidget Spinner
 
-Turn your react component into a fun clickable spinning widget.
+Turn your react component into a fun clickable spinning widget. Click Me ⬇️
 
-Click Me ⬇️
 
-<Primary  />
-
+<Primary of={FidgetSpinnerStories} />
 
 ## Quickstart
 
 ```bash
 npm i react-fidget-spinner
 ```
+
+
 
 ```jsx
 import {FidgetSpinner} from "react-fidget-spinner"
@@ -31,6 +32,7 @@ const MyFidgetSpinner = () => {
     )
 }
 ```
+
 
 ## Using These Docs
 

@@ -1,0 +1,170 @@
+import { Meta, ArgTypes, Story, Canvas, Source, Markdown, Primary } from "@storybook/blocks";
+
+import * as FidgetSpinnerStories from "../FidgetSpinner/FidgetSpinner.stories"
+
+<Meta title="Blog/Blog" />
+
+
+# What has 8 files, 312kb of unpacked volume and nearly 1000 downloads? 🏰
+
+**It's this really silly little bundle of code that I wrote over Christmas 🎄**
+
+It’s called `react-fidget-spinner` and it's a small bit of code that is designed to take a small part of a website, maybe an image, whatever you like, and transform it into a something that spins when you click it.
+
+
+**Sort of like a fidget spinner. 🤷‍♂️**
+
+(It's all a bit tenuous but I had to name it something)
+
+
+
+---
+
+**Click Me ⬇️**
+<Canvas of={FidgetSpinnerStories.Primary} />
+
+
+Like a fidget spinner, the premise is simple:
+
+- The more you click it
+- The faster it spins
+- And the larger is gets
+- It starts shooting out sparks it’s going so fast
+- And then some bubbles
+- Then it stops.
+
+But also, like a fidget spinner, **this package is realistically not that useful for anything**
+
+But it *was fun to make* and I learnt a few things along the way so...
+
+
+
+## What can we learn from this silly christmas project?
+
+I kept some detailed notes as I went in a [dev diary](/docs/blog-diary--docs)
+and I'll go through a few of my favourite learnings in a bit more detail here.
+
+<Canvas of={FidgetSpinnerStories.TasteOfItaly} />
+
+### Storybook is great, if communication is important within a project.
+
+I mean, you are reading this blog here, live and direct from Storybook.
+
+Some interactive bits here. Some nice looking markdown and formatting there. You can host it easily and for free on GitHub, right alongside where you keep your code.  A lot of it can be generated from doc strings.
+
+It is absolutely **fabulous for communicating** technical components.
+
+However, strong communication and documentation is often the cherry on top in fast moving project teams. This is a side project. I think the burden of a good storybook could be tough for a team where designing components wasn't the core role.
+
+For component library teams, or package authors though? Seems like a great choice.
+
+
+
+
+<Canvas of={FidgetSpinnerStories.VelocityBreakpoints} />
+
+
+### Animation configuration gets fiddly, *fast*
+
+An interesting animation needs variety. Highly repetitive elements don't look or feel natural. They aren't engaging. But to make something look nice the cost is having to express that variety in configuration in multiple dimensions.
+
+#### Issue 1 - Lots of configuration options
+
+Even in a simple project like this one there are 63 things you could configure if you wanted to. They were all linked to different aspects of the animations. That's quite a lot of config already.
+
+#### Issue 2 - Describing variety in configuration
+
+Of those 63 configuration options, some of them you would want to vary. For example, you don't want every bubble to be the same size, or have the same velocity.
+I ended up with something I called a `NumericControl`. Which was a nice consistent way of describing variety of a control. At runtime you can then parse the control using generators to get the random value in the expressed range.
+
+```tsx
+// Between 90 and 110
+const bubbleSize : NumericControl = {
+    value: 100,
+    variation: {
+        type: 'PlusMinus', 
+        unit: 'Percent',
+        value: 10 
+    }
+}
+
+// Between 20 and 25
+const sparkVelocity : NumericControl = {
+    value: 20,
+    variation: {
+        type: 'Plus',
+        unit: 'Absolute',
+        value: 5
+    }
+}
+
+```
+
+#### Issue 3 - Describing configuration changes in relation to spinning velocity
+
+I really didn't want to go down the path of writing something like keyframes for this project...
+
+and I thought I had managed to avoid writing my own keyframe code.
+
+
+> 💡 A keyframe is an animation term that describes how you might change something over time.
+>
+> For example,  you might want an animated bubble to start small and grow over time. You could express this by specifying the start size of the bubble, the end size of the bubble and how long it takes to grow. 
+>
+> (It can get more fiddly than that, but that's the jist.) 
+
+But in reflection, I did end up with something *suspiciously close* to keyframes. **Velocity breakpoints.** (I stole the name from CSS Breakpoints 🤫)
+
+These allow you to change the configuration of the animation as the veloctiy of the fidget spinner changes.
+
+Here's a basic example. Which Changes the scale to x3 at 90% of the max velocity. and x2 at 70% of the max velocity. Behind the scenes you need to add in some logic to make the step changes not feel too sudden. But I won't go into that.
+
+```
+export const defaultVelocityBreakpoints: VelocityBreakpointInput[] = [
+    {
+        breakpoint: 0.9, // Triggers at 90% of the max velocity
+        config: {
+            scaleConfig: {scale: 3},
+        },
+    },
+    {
+        breakpoint: 0.7, // Triggers at 70% 
+        config: {
+            scaleConfig: {scale: 2},
+        },
+    },
+];
+```
+
+<Canvas of={FidgetSpinnerStories.FullConfiguration} />
+
+### Getting a working prototyp with AI is quick but with tradeoffs.
+
+This project sprung up from a silly idea I had when I was ill on the sofa and I got a small interactive animation working quickly.
+But to communicate the ideas in it, and turn it into a package that someone with no context might be able to configure and understand? That took a lot longer.
+But, an AI consuming from AI world awaits, human communication and clarity becomes less important as long as it **just works**. But for the moment. It is symbiotic and I think good packages still need to communicate clearly. 
+
+
+
+
+
+
+### Thank you
+
+If you've made it through all this. *Thank you for reading.* I hope a small snippet into the world of making interactive animations was somewhat interesting.
+
+If you make a fidget spinner on this site by using the interactive controls. Let me know ❤️
+
+Nick
+
+---
+
+ps. a big shoutout to Dani who must have heard me say
+> "ooo look how it spins *now*"
+
+about 100 times. What a patient woman. 🧘‍♀️
+
+
+
+
+
