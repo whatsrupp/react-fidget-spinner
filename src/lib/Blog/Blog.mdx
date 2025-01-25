@@ -66,11 +66,11 @@ For component library teams, or package authors though? Seems like a great choic
 
 ### Animation configuration gets fiddly, *fast*
 
-An interesting animation needs variety. Highly repetitive elements don't look or feel natural. They aren't engaging. But to make something look nice the cost is having to express that variety in configuration in multiple dimensions.
+An interesting animation needs variety. Highly repetitive elements don't look or feel natural. They aren't engaging. To make something look nice you have to pay the price that comes with expressing lots of variety in configuration.
 
 #### Issue 1 - Lots of configuration options
 
-Even in a simple project like this one there are 63 things you could configure if you wanted to. They were all linked to different aspects of the animations. That's quite a lot of config already.
+Even in a simple project like this one there are 63 things (at time of writing) you could configure if you wanted to. They were all linked to different aspects of the animations. That's quite a lot of config already.
 
 #### Issue 2 - Describing variety in configuration
 
@@ -138,15 +138,12 @@ export const defaultVelocityBreakpoints: VelocityBreakpointInput[] = [
 
 <Canvas of={FidgetSpinnerStories.FullConfiguration} />
 
-### Getting a working prototyp with AI is quick but with tradeoffs.
+### Making a prototype with AI is quick but comes with tradeoffs.
 
 This project sprung up from a silly idea I had when I was ill on the sofa and I got a small interactive animation working quickly.
-But to communicate the ideas in it, and turn it into a package that someone with no context might be able to configure and understand? That took a lot longer.
-But, an AI consuming from AI world awaits, human communication and clarity becomes less important as long as it **just works**. But for the moment. It is symbiotic and I think good packages still need to communicate clearly. 
 
-
-
-
+But, to communicate the ideas in it and turn it into a package that someone with no context might be able to configure and understand? That took longer. It required breaking out components and structures from the mass of ai code and simplifying a few concepts for reuse.
+An AI consuming from AI world awaits us though. Human communication and clarity becomes less important as long as whatever AI generates **just works**. But for the moment, the AI human relationship is symbiotic and I think good packages still needs to communicate clearly for both parties and that just takes a bit of extra time. 
 
 
 ### Thank you
