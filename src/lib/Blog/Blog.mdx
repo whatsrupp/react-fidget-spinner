@@ -117,9 +117,13 @@ But in reflection, I did end up with something *suspiciously close* to keyframes
 
 These allow you to change the configuration of the animation as the veloctiy of the fidget spinner changes.
 
-Here's a basic example. Which Changes the scale to x3 at 90% of the max velocity. and x2 at 70% of the max velocity. Behind the scenes you need to add in some logic to make the step changes not feel too sudden. But I won't go into that.
+Here's a basic example which:
+- changes the scale to x2 at 70% of the max velocity
+- changes the scale to x3 at 90% of the max velocity
 
-```
+Behind the scenes you need to add in some logic to make the changes feel smooth instead of sudden. But I won't go into that here.
+
+```tsx
 export const defaultVelocityBreakpoints: VelocityBreakpointInput[] = [
     {
         breakpoint: 0.9, // Triggers at 90% of the max velocity
